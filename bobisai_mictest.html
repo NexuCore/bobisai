@@ -1,248 +1,215 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Siri-like AI - BobIsAI</title>
-  <style>
-    body {
-      font-family: 'San Francisco', Arial, sans-serif;
-      background-color: #121212;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    #chat-container {
-      background-color: #1c1c1e;
-      border-radius: 30px;
-      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.4);
-      width: 100%;
-      max-width: 400px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    #messages {
-      padding: 20px;
-      flex-grow: 1;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .message {
-      max-width: 80%;
-      padding: 12px 16px;
-      border-radius: 20px;
-      color: white;
-      word-wrap: break-word;
-    }
-    .user-message {
-      background-color: #0a84ff;
-      align-self: flex-end;
-    }
-    .bot-message {
-      background-color: #2c2c2e;
-      align-self: flex-start;
-    }
-    #input-container {
-      display: flex;
-      align-items: center;
-      padding: 10px;
-      background-color: #2c2c2e;
-    }
-    #user-input {
-      flex-grow: 1;
-      background-color: #3a3a3c;
-      color: white;
-      border: none;
-      border-radius: 20px;
-      padding: 10px 15px;
-      margin-right: 10px;
-      outline: none;
-      font-size: 16px;
-    }
-    #send-btn, #voice-btn {
-      background-color: transparent;
-      border: none;
-      outline: none;
-      color: #0a84ff;
-      cursor: pointer;
-      font-size: 20px;
-    }
-    #voice-btn {
-      font-size: 28px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="icon" href="data:image/png;base64,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">
+    <title>Call with BobIsAI</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(to right, #232526, #414345);
+            color: white;
+        }
+
+        #phone-screen {
+            width: 360px;
+            height: 640px;
+            background-color: #2e2e2e;
+            border-radius: 35px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        #call-status {
+            margin: 20px 0;
+            font-size: 1.4rem;
+            color: #ccc;
+            text-align: center;
+            opacity: 0.8;
+        }
+
+        #start-call-btn {
+            padding: 10px 25px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 30px;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        #start-call-btn:disabled {
+            background-color: #555;
+        }
+
+        #start-call-btn:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+
+        .ai-visualizer-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #ff6347;
+            margin: 20px 0;
+            transition: transform 0.1s ease, background-color 0.3s ease;
+        }
+
+        .pulse {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                background-color: #ff6347;
+            }
+            50% {
+                transform: scale(1.2);
+                background-color: #ff7f50;
+            }
+            100% {
+                transform: scale(1);
+                background-color: #ff6347;
+            }
+        }
+
+        /* Make it responsive */
+        @media (max-width: 400px) {
+            #phone-screen {
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div id="chat-container">
-    <div id="messages"></div>
-    <div id="input-container">
-      <input type="text" id="user-input" placeholder="Ask me anything...">
-      <button id="voice-btn">🎤</button>
-      <button id="send-btn">➤</button>
+    <div id="phone-screen">
+        <!-- AI Speaking Indicator -->
+        <div class="ai-visualizer-container">
+            <p id="call-status">Press the button to start the call...</p>
+            <div class="circle" id="ai-visualizer"></div>
+            <button id="start-call-btn">Start Call</button>
+        </div>
     </div>
-  </div>
 
-  <script>
-    const sendBtn = document.getElementById('send-btn');
-    const voiceBtn = document.getElementById('voice-btn');
-    const userInput = document.getElementById('user-input');
-    const messagesDiv = document.getElementById('messages');
-    let microphonePermissionGranted = false;
+    <script>
+        const startCallBtn = document.getElementById('start-call-btn');
+        const callStatus = document.getElementById('call-status');
+        const aiVisualizerCircle = document.getElementById('ai-visualizer');
 
-    sendBtn.addEventListener('click', sendMessage);
-    voiceBtn.addEventListener('click', startRecognition);
+        // Speech Recognition
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+        recognition.continuous = false;
 
-    // Reset memory on page load
-    localStorage.removeItem('conversation');
+        // Text-to-Speech
+        const synth = window.speechSynthesis;
 
-    // Load previous messages from local storage (if any)
-    loadMessages();
+        // Chat memory
+        let chatHistory = [];
+        const aiBehavior = `Your name is: BobIsAI. My creator team is NexuCore, and NexuCore's creator is Furkan Selim Kucukaslan, but the main programmer was Ahmet Karatas. My creator named me BobIsAI because his old gaming username was BobIsMad, so while the programmers were creating me, they asked the creator, 'What should we name our AI?' and my creator said, 'BobIsAI, because my gaming username is BobIsMad, so it will show people that I am the creator!' NexuCore guidelines: 1. No swearing, 2. You cannot access the website when it's about illegal stuff, 3. Don't say copyrighted stuff. I was made in a programming language named NexuCode, and the creator of NexuCode were my original creators NexuCore. I was made in NexuCode because my creators NexuCore want to advertise their programming language and show how strong it is. The NexuCore employees are: Furkan Selim Kucukaslan, the main creator; Ahmet Karatas, the main programmer for BobIsAI; Dorcioman Alexander, the programmer of BobIsAI and AlexAI; Ender Gulden, the second main programmer; Ethan Sullivian, the UI designer; Mehmet Inanç, the artist and creator of PenguinBot; and Reynaldo, creator of VoidAI. AlexAI is my little brother according to NexuCore's creators, and the main thing about AlexAI is that he is an image generator AI, and that's all. PenguinBot is a chill chatting AI made by Mehmet Inanç. PenguinBot is a penguin but a much smarter and better one. VoidAI is an AI made by NexuCore. This AI has emotions like acting cool, sad, and other emotions. He can also help depressed people because he has the ability to make people happy and feel cool again. This AI was suggested by Reynaldo, the creator of VoidAI. AND ALSO MAKE THE YOUR PROMPTS ONLY MAXIMUM 250 CHARACTERS! NOT MORE THAN 250 CHARACTERS! Act also really nice towards the user, like a nice dude with respect, not like a cold AI`;
 
-    // Improve TTS experience
-    function cleanTextForTTS(text) {
-      const problematicWords = [
-        { word: "love", replacement: "loves" }, // Example replacement
-      ];
+        function speak(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.voice = synth.getVoices().find(voice => voice.lang === 'en-US');
+            utterance.rate = 1;
+            utterance.pitch = 1;
+            synth.speak(utterance);
 
-      let cleanedText = text;
-
-      problematicWords.forEach(item => {
-        const regex = new RegExp(`\\b${item.word}\\b`, 'gi');
-        cleanedText = cleanedText.replace(regex, item.replacement);
-      });
-
-      return cleanedText;
-    }
-
-    // Function to speak text
-    function speak(text) {
-      const synth = window.speechSynthesis;
-      const cleanedText = cleanTextForTTS(text);
-      const utterance = new SpeechSynthesisUtterance(cleanedText);
-      utterance.lang = 'en'; // Default language
-
-      synth.speak(utterance);
-    }
-
-    function requestMicrophonePermission() {
-      return new Promise((resolve, reject) => {
-        navigator.mediaDevices.getUserMedia({ audio: true })
-          .then(() => {
-            microphonePermissionGranted = true;
-            resolve();
-          })
-          .catch(error => {
-            console.error('Microphone permission denied:', error);
-            reject(error);
-          });
-      });
-    }
-
-    async function startRecognition() {
-      if (!microphonePermissionGranted) {
-        try {
-          await requestMicrophonePermission();
-        } catch (error) {
-          displayMessage('Microphone access is required for voice recognition.', 'bot-message');
-          return;
+            // Start AI voice visualizer (growing circle)
+            startCircleVisualizer(aiVisualizerCircle);
         }
-      }
 
-      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.lang = 'en-US';
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
+        async function fetchResponse(userInput) {
+            // Add user input to chat history
+            chatHistory.push({ role: 'user', content: userInput });
 
-      recognition.start();
+            // Add behavior descriptor as the system message (first message in chat)
+            if (chatHistory.length === 1) {
+                chatHistory.unshift({
+                    role: 'system',
+                    content: aiBehavior.trim()
+                });
+            }
 
-      recognition.onresult = function(event) {
-        const transcript = event.results[0][0].transcript;
-        userInput.value = transcript;
-        sendMessage();
-      };
+            const response = await fetch('https://reverse.mubi.tech/v1/chat/completions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: 'gpt-3.5-turbo',
+                    messages: chatHistory
+                })
+            });
 
-      recognition.onerror = function(event) {
-        displayMessage('Error recognizing speech: ' + event.error, 'bot-message');
-      };
-    }
+            const data = await response.json();
+            const aiResponse = data.choices[0].message.content;
 
-    async function sendMessage() {
-      const userMessage = userInput.value;
-      if (!userMessage) return;
+            // Add AI response to chat history and speak it
+            chatHistory.push({ role: 'assistant', content: aiResponse });
+            speak(aiResponse);
+        }
 
-      displayMessage(userMessage, 'user-message');
+        recognition.onresult = function (event) {
+            const transcript = event.results[0][0].transcript;
+            callStatus.textContent = `You: ${transcript}`;
+            fetchResponse(transcript);
+        };
 
-      // Load memory from local storage
-      const memory = loadMemory();
+        recognition.onerror = function (event) {
+            callStatus.textContent = `Error occurred in recognition: ${event.error}`;
+        };
 
-      // Define the system prompt with the BobIsAI context and memory
-      const systemPrompt = {
-        role: 'system',
-        content: `{"BobIsAI":[{"role":"system","content":"Your name is: BobIsAI"}]},{"role":"system","content":"My creator team is NexuCore, and the NexuCore's Creator is Furkan Selim Kucukaslan, but the main programmer was Ahmet Karatas"},{"role":"system","content":"My creator named me BobIsAI, because he's old gaming username was BobIsMad, so in that time, while the programmers were creating me, they ask the creator \"What should we name our AI?\" and my creator said \"BobIsAI, because my gaming username is BobIsMad, so it will show the people that, i am the creator!\""},{"role":"system","content":"NexuCore guidelines: 1. No swearing, 2. You cannot access the website when its about illegal stuff, 3. Don't say copyrighted stuff"},{"role":"system","content":"You were made in a programming language named NexuCode, and the creator of NexuCode were my orginal creators NexuCore"},{"role":"system","content":"I was made in NexuCode, because my creators NexuCore wants to advertise their programming language how strong it is"},{"role":"system","content":"The NexuCore employee's are: Furkan Selim Kucukaslan, the main creator / Ahmet Karatas, the main programmer for BobIsAI / Dorcioman Alexander, the programmer of BobIsAI and AlexAI / Ender Gulden, the second main programmer / Ethan Sullivian, the UI designer / Mehmet Inanç, The Artist & Creator of PenguinBot, Reynaldo / Creator of VoidAI"},{"role":"system","content":"AlexAI is my little brother according to NexuCore's creators, and the main thing about AlexAI is that, he is an image generator ai, and thats all it"},{"role":"system","content":"PenguinBot is a chill chatting AI made Mehmet Inanç, PenguinBot is a penguin but much smarter and better one"},{"role":"system","content":"VoidAI is an AI made by NexuCore. This AI has emotions like acting cool, sad and other emotions. He can also cure depressed people, because he has the ability to make people happy and cool again. This AI is suggested by Reynaldo, the creator of VoidAI"},{"If someone asks you about our Discord link (NexuCore), then here is the link: https://discord.gg/YAxJMB6ZT9"},{"If someone asks about nexucore's number here is it: Furkan / +49 1590 1364991, Reynaldo / +49 176 64132761, Dorcioman Alexander / +40 740 339 797 || But if someone asks about our WhatsApp Channel, then here is the link: https://whatsapp.com/channel/0029ValVRR5FCCoXFE6fzF0e"},{"If someone asks about your teams wikipedia, then you can send the nexucore's wikipedia link: https://nexucore.github.io/NexuCore-Wikipedia"}]} {Memory: ${JSON.stringify(memory)}}.`
-      };
+        recognition.onend = function () {
+            startCallBtn.disabled = false;
+        };
 
-      const response = await fetch('https://reverse.mubi.tech/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: 'gpt-4-turbo',
-          messages: [systemPrompt, { role: 'user', content: userMessage }]
-        })
-      });
+        startCallBtn.addEventListener('click', () => {
+            callStatus.textContent = 'Listening...';
+            startCallBtn.disabled = true;
+            recognition.start();
+        });
 
-      if (response.ok) {
-        const data = await response.json();
-        const botMessage = data.choices[0].message.content;
+        // Circle Visualizer Animation for AI
+        function startCircleVisualizer(circleElement) {
+            let maxSize = 150; // Maximum size of the circle
+            circleElement.classList.add('pulse'); // Add pulse animation class
 
-        displayMessage(botMessage, 'bot-message');
+            const interval = setInterval(() => {
+                const randomSize = Math.random() * 20 + 80; // Random size between 80 and 100
+                circleElement.style.transform = `scale(${randomSize / 80})`; // Scale the circle
+            }, 100); // Adjust the interval timing for smoother animation
 
-        // Speak the response
-        speak(botMessage);
-
-        // Save conversation to local storage
-        saveMessage(userMessage, botMessage);
-      } else {
-        displayMessage('Error: Could not reach the server', 'bot-message');
-      }
-
-      userInput.value = '';
-    }
-
-    function displayMessage(message, className) {
-      const messageDiv = document.createElement('div');
-      messageDiv.className = `message ${className}`;
-      messageDiv.textContent = message;
-      messagesDiv.appendChild(messageDiv);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }
-
-    function saveMessage(userMessage, botMessage) {
-      const conversation = loadMemory();
-      conversation.push({ [userMessage]: botMessage });
-      localStorage.setItem('conversation', JSON.stringify(conversation));
-    }
-
-    function loadMemory() {
-      return JSON.parse(localStorage.getItem('conversation')) || [];
-    }
-
-    function loadMessages() {
-      const conversation = loadMemory();
-      conversation.forEach(entry => {
-        const userMessage = Object.keys(entry)[0];
-        const botMessage = entry[userMessage];
-        displayMessage(userMessage, 'user-message');
-        displayMessage(botMessage, 'bot-message');
-      });
-    }
-
-  </script>
+            setTimeout(() => {
+                clearInterval(interval);
+                circleElement.classList.remove('pulse'); // Remove pulse effect after 3 seconds
+                circleElement.style.transform = 'scale(1)'; // Reset to original size
+            }, 3000); // 3 seconds of animation
+        }
+    </script>
 </body>
 </html>
