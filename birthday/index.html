@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BobIsAI's Birthday Countdown</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(to bottom right, #1e3c72, #2a5298);
+            background-attachment: fixed;
+            color: #f2f2f2;
+            overflow: hidden;
+        }
+
+        /* Background Overlay for better text visibility */
+        .background-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: -1;
+        }
+
+        /* Center Content */
+        .content {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 1.2rem;
+            color: #f0e68c;
+            margin-bottom: 30px;
+        }
+
+        /* Countdown Numbers Style */
+        #countdown {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            font-size: 2rem;
+        }
+
+        .countdown-section {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .countdown-number {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #FFD700;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .countdown-label {
+            font-size: 1rem;
+            color: #dcdcdc;
+        }
+
+        .button-container {
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #FFD700;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #fff;
+        }
+
+        button:hover {
+            background-color: #f0e68c;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-overlay"></div>
+
+    <div class="content">
+        <h1>Countdown to BobIsAI's Birthday!</h1>
+        <p>December 20th is the AI's special day!</p>
+        <div id="countdown">
+            <div class="countdown-section">
+                <span class="countdown-number" id="days">00</span>
+                <span class="countdown-label">Days</span>
+            </div>
+            <div class="countdown-section">
+                <span class="countdown-number" id="hours">00</span>
+                <span class="countdown-label">Hours</span>
+            </div>
+            <div class="countdown-section">
+                <span class="countdown-number" id="minutes">00</span>
+                <span class="countdown-label">Minutes</span>
+            </div>
+            <div class="countdown-section">
+                <span class="countdown-number" id="seconds">00</span>
+                <span class="countdown-label">Seconds</span>
+            </div>
+        </div>
+
+        <!-- Button to start music -->
+        <div class="button-container">
+            <button id="start-music">Start Music</button>
+        </div>
+    </div>
+
+    <!-- Background Music -->
+    <audio id="background-music" loop>
+        <source src="https://nexucore.github.io/bobisai/birthday/music.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        // Set the target date and time
+        const targetDate = new Date('December 20, ' + new Date().getFullYear() + ' 00:00:00').getTime();
+
+        // Update the countdown every second
+        const countdownInterval = setInterval(() => {
+            const now = new Date().getTime();
+            const timeRemaining = targetDate - now;
+
+            // Calculate days, hours, minutes, and seconds remaining
+            const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+            // Display the countdown
+            document.getElementById("days").textContent = days.toString().padStart(2, '0');
+            document.getElementById("hours").textContent = hours.toString().padStart(2, '0');
+            document.getElementById("minutes").textContent = minutes.toString().padStart(2, '0');
+            document.getElementById("seconds").textContent = seconds.toString().padStart(2, '0');
+
+            // If the countdown is over, display a message
+            if (timeRemaining < 0) {
+                clearInterval(countdownInterval);
+                document.querySelector('.content').innerHTML = "<h1>🎉 Happy Birthday, BobIsAI! 🎉</h1><p>It's time to celebrate!</p>";
+            }
+        }, 1000);
+
+        // Start music on button click
+        const startMusicButton = document.getElementById('start-music');
+        const backgroundMusic = document.getElementById('background-music');
+        
+        startMusicButton.addEventListener('click', function() {
+            backgroundMusic.play();
+            startMusicButton.style.display = 'none'; // Hide the button after clicking
+        });
+    </script>
+
+</body>
+</html>
