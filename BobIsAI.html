@@ -514,6 +514,32 @@
             opacity: 1;
             pointer-events: all;
         }
+
+        /* Add this to your existing CSS */
+    .chat-messages {
+        scrollbar-width: thin;
+        scrollbar-color: var(--primary-color) var(--secondary-color);
+    }
+
+    /* For Webkit browsers (Chrome, Safari) */
+    .chat-messages::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+        background: var(--secondary-color);
+        border-radius: 4px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+        background-color: var(--primary-color);
+        border-radius: 4px;
+        border: 2px solid var(--secondary-color);
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb:hover {
+        background-color: var(--primary-light);
+    }
     </style>
 </head>
 <body>
