@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BobIsAI Chat</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --primary-light: #6a8fc5;
+            --secondary-color: #f0f4f8;
+            --text-color: #333;
+            --light-text: #666;
+            --border-color: #e0e0e0;
+            --transition-speed: 0.3s;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: var(--text-color);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background-color: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .logo {
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .model-selector {
+            position: relative;
+            z-index: 10;
+        }
+        
+        .model-dropdown-btn {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all var(--transition-speed) ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .model-dropdown-btn:hover {
+            background-color: #f5f5f5;
+            border-color: var(--primary-light);
+        }
+        
+        .model-dropdown-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
+        }
+        
+        .model-dropdown-btn::after {
+            content: "";
+            display: inline-block;
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid var(--light-text);
+            transition: transform var(--transition-speed) ease;
+        }
+        
+        .model-dropdown-btn.open::after {
+            transform: rotate(180deg);
+        }
+        
+        .model-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 200px;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transition: all var(--transition-speed) ease;
+            transform-origin: top;
+            transform: scaleY(0);
+        }
+        
+        .model-dropdown-menu.open {
+            max-height: 300px;
+            opacity: 1;
+            transform: scaleY(1);
+            margin-top: 5px;
+        }
+        
+        .model-option {
+            padding: 10px 16px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.2s ease;
+        }
+        
+        .model-option:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .model-option.active {
+            background-color: rgba(74, 111, 165, 0.1);
+        }
+        
+        .model-name {
+            font-weight: 500;
+        }
+        
+        .model-description {
+            font-size: 0.75rem;
+            color: var(--light-text);
+            margin-top: 2px;
+        }
+        
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            height: calc(100vh - 120px);
+        }
+        
+        .welcome-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--light-text);
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+        
+        .welcome-message.hidden {
+            opacity: 0;
+            height: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            line-height: 1.5;
+            position: relative;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: messageAppear 0.3s ease forwards;
+        }
+        
+        @keyframes messageAppear {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .user-message {
+            align-self: flex-end;
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom-right-radius: 4px;
+            animation-delay: 0.1s;
+        }
+        
+        .ai-message {
+            align-self: flex-start;
+            background-color: var(--secondary-color);
+            border-bottom-left-radius: 4px;
+            animation-delay: 0.2s;
+        }
+        
+        .input-container {
+            padding: 15px 20px;
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            transition: all 0.3s ease;
+        }
+        
+        #message-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            outline: none;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        #message-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
+        }
+        
+        #send-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0 20px;
+            margin-left: 10px;
+            border-radius: 24px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        #send-button:hover {
+            background-color: #3a5a80;
+            transform: scale(1.05);
+        }
+        
+        #send-button:active {
+            transform: scale(0.95);
+        }
+        
+        .typing-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            background-color: var(--secondary-color);
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            margin-bottom: 15px;
+            align-self: flex-start;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: typingAppear 0.3s ease forwards;
+        }
+        
+        @keyframes typingAppear {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .typing-dots {
+            display: flex;
+            margin-left: 8px;
+        }
+        
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--light-text);
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typingAnimation {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        .model-transition {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        
+        .model-transition.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .model-transition-icon {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 20px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            animation: pulse 2s infinite ease-in-out;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+        
+        .model-transition-text {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">BobIsAI</div>
+        <div class="model-selector">
+            <button class="model-dropdown-btn" id="model-dropdown-btn">
+                <span id="current-model-name">BobIsAI</span>
+            </button>
+            <div class="model-dropdown-menu" id="model-dropdown-menu">
+                <div class="model-option" data-model="bob">
+                    <span class="model-name">BobIsAI</span>
+                    <span class="model-description">Ideal for everyday tasks</span>
+                </div>
+                <div class="model-option" data-model="void">
+                    <span class="model-name">VoidAI</span>
+                    <span class="model-description">Advanced and philosophical</span>
+                </div>
+                <div class="model-option" data-model="penguin">
+                    <span class="model-name">PenguinBot</span>
+                    <span class="model-description">Fun and penguin-loving</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="model-transition" id="model-transition">
+        <div class="model-transition-icon" id="transition-icon">B</div>
+        <div class="model-transition-text">Switching to <span id="transition-model-name">BobIsAI</span></div>
+    </div>
+    
+    <div class="chat-container">
+        <div class="welcome-message" id="welcome-message">
+            <p>Hi, I'm BobIsAI.</p>
+            <p>How can I help you today?</p>
+        </div>
+        
+        <div class="chat-messages" id="chat-messages"></div>
+        
+        <div class="input-container">
+            <input type="text" id="message-input" placeholder="Message BobIsAI" autocomplete="off">
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const messageInput = document.getElementById('message-input');
+            const sendButton = document.getElementById('send-button');
+            const chatMessages = document.getElementById('chat-messages');
+            const welcomeMessage = document.getElementById('welcome-message');
+            const modelDropdownBtn = document.getElementById('model-dropdown-btn');
+            const modelDropdownMenu = document.getElementById('model-dropdown-menu');
+            const currentModelName = document.getElementById('current-model-name');
+            const modelTransition = document.getElementById('model-transition');
+            const transitionIcon = document.getElementById('transition-icon');
+            const transitionModelName = document.getElementById('transition-model-name');
+            
+            // AI Personalities
+            const personalities = {
+                bob: {
+                    name: "BobIsAI",
+                    description: "Ideal for everyday tasks",
+                    systemMessage: "You are BobIsAI, a friendly and slightly quirky AI assistant. " +
+                                  "You are robotic, You are created by NexuCore team, which is made by Furkan Selim Kucukaslan" +
+                                  "You are robot for people who need help for their study, programming or any other work." +
+                                  "He has a brother called AlexAI, but he is retired from drawing stuff",
+                    placeholder: "Message BobIsAI",
+                    welcome: ["Hi, I'm BobIsAI.", "How can I help you today?"],
+                    icon: "B",
+                    color: "#4a6fa5"
+                },
+                void: {
+                    name: "VoidAI",
+                    description: "Advanced and philosophical",
+                    systemMessage: "You are VoidAI, a cool friend AI that acts cool." +
+                                  "You speak friendly, and you use the phrase 'dude' or 'blud' and other Generation Z words" +
+                                  "Acts like a cool dude or friend" +
+                                  "His best friend is EchoGPT",
+                    placeholder: "Message VoidAI",
+                    welcome: ["Greetings. I am VoidAI.", "What knowledge do you seek from the void?"],
+                    icon: "V",
+                    color: "#333333"
+                },
+                penguin: {
+                    name: "PenguinBot",
+                    description: "Fun and penguin-loving",
+                    systemMessage: "You are PenguinBot, an adorable AI assistant. " +
+                                  "You love all things penguins and often make penguin-related puns. " +
+                                  "You're cheerful, polite, and slightly silly. " +
+                                  "When asked about yourself, say: 'I'm PenguinBot, waddling through your questions with precision! Slide into my DMs with any queries!'",
+                    placeholder: "Message PenguinBot",
+                    welcome: ["Hello there! I'm PenguinBot!", "How can I waddle through your questions today?"],
+                    icon: "P",
+                    color: "#2c3e50"
+                }
+            };
+            
+            // Current personality
+            let currentPersonality = 'bob';
+            
+            // Conversation memory
+            let conversationHistory = [
+                {
+                    role: "system",
+                    content: personalities.bob.systemMessage
+                }
+            ];
+            
+            // Toggle dropdown menu
+            function toggleDropdown() {
+                modelDropdownMenu.classList.toggle('open');
+                modelDropdownBtn.classList.toggle('open');
+            }
+            
+            // Close dropdown menu
+            function closeDropdown() {
+                modelDropdownMenu.classList.remove('open');
+                modelDropdownBtn.classList.remove('open');
+            }
+            
+            // Update UI for current personality
+            function updatePersonalityUI() {
+                const personality = personalities[currentPersonality];
+                
+                // Update welcome message
+                welcomeMessage.innerHTML = `
+                    <p>${personality.welcome[0]}</p>
+                    <p>${personality.welcome[1]}</p>
+                `;
+                
+                // Update input placeholder
+                messageInput.placeholder = personality.placeholder;
+                
+                // Update current model name
+                currentModelName.textContent = personality.name;
+                
+                // Update active option in dropdown
+                document.querySelectorAll('.model-option').forEach(option => {
+                    if (option.dataset.model === currentPersonality) {
+                        option.classList.add('active');
+                    } else {
+                        option.classList.remove('active');
+                    }
+                });
+            }
+            
+            // Show model transition animation
+            function showModelTransition(newPersonality) {
+                const personality = personalities[newPersonality];
+                
+                // Update transition screen
+                transitionIcon.textContent = personality.icon;
+                transitionIcon.style.backgroundColor = personality.color;
+                transitionModelName.textContent = personality.name;
+                
+                // Show transition
+                modelTransition.classList.add('active');
+                
+                // Hide after animation
+                setTimeout(() => {
+                    modelTransition.classList.remove('active');
+                }, 1000);
+            }
+            
+            // Change personality
+            function changePersonality(personality) {
+                if (personality === currentPersonality) return;
+                
+                // Show transition animation
+                showModelTransition(personality);
+                
+                // Close dropdown
+                closeDropdown();
+                
+                // Wait for animation to start before changing
+                setTimeout(() => {
+                    currentPersonality = personality;
+                    
+                    // Reset conversation history
+                    conversationHistory = [
+                        {
+                            role: "system",
+                            content: personalities[personality].systemMessage
+                        }
+                    ];
+                    
+                    // Clear chat messages
+                    chatMessages.innerHTML = '';
+                    
+                    // Show welcome message again
+                    welcomeMessage.style.display = 'block';
+                    welcomeMessage.classList.remove('hidden');
+                    
+                    // Update UI
+                    updatePersonalityUI();
+                    
+                    // Save to localStorage
+                    localStorage.setItem('bobisai_personality', personality);
+                    localStorage.removeItem('bobisai_conversation');
+                }, 100);
+            }
+            
+            // Handle sending messages
+            function sendMessage() {
+                const message = messageInput.value.trim();
+                if (message === '') return;
+                
+                // Hide welcome message if it's the first user message
+                if (!welcomeMessage.classList.contains('hidden')) {
+                    welcomeMessage.classList.add('hidden');
+                }
+                
+                // Add user message to chat
+                addMessage(message, 'user');
+                // Add to conversation history
+                conversationHistory.push({
+                    role: "user",
+                    content: message
+                });
+                
+                messageInput.value = '';
+                
+                // Show typing indicator
+                showTypingIndicator();
+                
+                // Call API
+                fetch('https://ai.aerioncloud.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        model: "deepseek-r1",
+                        messages: conversationHistory,
+                        temperature: 0.7,
+                        max_tokens: 2048
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Hide typing indicator
+                    hideTypingIndicator();
+                    
+                    // Add AI response to chat and history
+                    if (data.choices && data.choices[0] && data.choices[0].message) {
+                        const aiResponse = data.choices[0].message.content;
+                        conversationHistory.push({
+                            role: "assistant",
+                            content: aiResponse
+                        });
+                        simulateTyping(aiResponse, 'ai');
+                        
+                        // Store conversation in localStorage
+                        localStorage.setItem('bobisai_conversation', JSON.stringify(conversationHistory));
+                    } else {
+                        addMessage("Sorry, I couldn't process your request.", 'ai');
+                    }
+                })
+                .catch(error => {
+                    hideTypingIndicator();
+                    addMessage("Error connecting to the AI service. Please try again.", 'ai');
+                    console.error('Error:', error);
+                });
+            }
+            
+            // Add message to chat UI
+            function addMessage(text, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
+                messageDiv.textContent = text;
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Show typing indicator
+            function showTypingIndicator() {
+                const typingDiv = document.createElement('div');
+                typingDiv.classList.add('typing-indicator');
+                typingDiv.id = 'typing-indicator';
+                typingDiv.innerHTML = `
+                    <span>${personalities[currentPersonality].name} is typing</span>
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                `;
+                chatMessages.appendChild(typingDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Hide typing indicator
+            function hideTypingIndicator() {
+                const typingIndicator = document.getElementById('typing-indicator');
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+            }
+            
+            // Simulate typing effect for AI messages
+            function simulateTyping(text, sender) {
+                hideTypingIndicator();
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
+                chatMessages.appendChild(messageDiv);
+                
+                let i = 0;
+                const speed = 20; // milliseconds per character
+                
+                function typeWriter() {
+                    if (i < text.length) {
+                        messageDiv.textContent += text.charAt(i);
+                        i++;
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                        setTimeout(typeWriter, speed);
+                    }
+                }
+                
+                typeWriter();
+            }
+            
+            // Load previous conversation from localStorage
+            function loadConversation() {
+                const savedPersonality = localStorage.getItem('bobisai_personality');
+                if (savedPersonality && personalities[savedPersonality]) {
+                    currentPersonality = savedPersonality;
+                }
+                
+                const savedConversation = localStorage.getItem('bobisai_conversation');
+                if (savedConversation) {
+                    conversationHistory = JSON.parse(savedConversation);
+                    
+                    // Replay conversation (skip system message)
+                    for (let i = 1; i < conversationHistory.length; i++) {
+                        const msg = conversationHistory[i];
+                        addMessage(msg.content, msg.role === 'user' ? 'user' : 'ai');
+                    }
+                    
+                    // Hide welcome message if we have history
+                    if (conversationHistory.length > 1) {
+                        welcomeMessage.classList.add('hidden');
+                    }
+                }
+                
+                // Update UI for current personality
+                updatePersonalityUI();
+            }
+            
+            // Event listeners
+            sendButton.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            // Model dropdown button
+            modelDropdownBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                toggleDropdown();
+            });
+            
+            // Model option selection
+            document.querySelectorAll('.model-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    changePersonality(this.dataset.model);
+                });
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', closeDropdown);
+            
+            // Focus input on load
+            messageInput.focus();
+            
+            // Load any previous conversation
+            loadConversation();
+        });
+    </script>
+</body>
+</html>
