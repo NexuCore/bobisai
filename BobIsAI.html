@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BobIsAI Chat</title>
-    <link rel="icon" href="https://nexucore.github.io/bobisai/birthday/logo.png" type="image/png">
     <style>
         :root {
             --primary-color: #4a6fa5;
@@ -13,48 +12,87 @@
             --text-color: #333;
             --light-text: #666;
             --border-color: #e0e0e0;
+            --bg-color: #f9f9f9;
+            --header-bg: white;
+            --input-bg: white;
+            --message-bg: white;
             --transition-speed: 0.3s;
         }
-        
+
+        /* Dark Mode Variables */
+        .dark-mode {
+            --primary-color: #6a8fc5;
+            --primary-light: #8aafd5;
+            --secondary-color: #2d3748;
+            --text-color: #f0f0f0;
+            --light-text: #a0aec0;
+            --border-color: #4a5568;
+            --bg-color: #1a202c;
+            --header-bg: #2d3748;
+            --input-bg: #2d3748;
+            --message-bg: #2d3748;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f9f9f9;
+            background-color: var(--bg-color);
             color: var(--text-color);
             height: 100vh;
             display: flex;
             flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
-        
+
         .header {
-            background-color: white;
+            background-color: var(--header-bg);
             padding: 15px 20px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
         }
-        
+
         .logo {
             font-weight: bold;
             color: var(--primary-color);
             font-size: 1.2rem;
             transition: transform 0.2s ease;
         }
-        
+
         .logo:hover {
             transform: scale(1.05);
         }
-        
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .settings-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: transform 0.2s ease;
+        }
+
+        .settings-btn:hover {
+            transform: rotate(30deg);
+        }
+
         .model-selector {
             position: relative;
             z-index: 10;
         }
-        
+
         .model-dropdown-btn {
-            background-color: white;
+            background-color: var(--header-bg);
             border: 1px solid var(--border-color);
             border-radius: 6px;
             padding: 8px 16px;
@@ -65,18 +103,19 @@
             gap: 8px;
             transition: all var(--transition-speed) ease;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            color: var(--text-color);
         }
-        
+
         .model-dropdown-btn:hover {
-            background-color: #f5f5f5;
+            background-color: var(--secondary-color);
             border-color: var(--primary-light);
         }
-        
+
         .model-dropdown-btn:focus {
             outline: none;
             box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
         }
-        
+
         .model-dropdown-btn::after {
             content: "";
             display: inline-block;
@@ -87,17 +126,17 @@
             border-top: 5px solid var(--light-text);
             transition: transform var(--transition-speed) ease;
         }
-        
+
         .model-dropdown-btn.open::after {
             transform: rotate(180deg);
         }
-        
+
         .model-dropdown-menu {
             position: absolute;
             top: 100%;
             right: 0;
             width: 200px;
-            background-color: white;
+            background-color: var(--header-bg);
             border: 1px solid var(--border-color);
             border-radius: 6px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
@@ -108,40 +147,127 @@
             transform-origin: top;
             transform: scaleY(0);
         }
-        
+
         .model-dropdown-menu.open {
             max-height: 300px;
             opacity: 1;
             transform: scaleY(1);
             margin-top: 5px;
         }
-        
+
         .model-option {
             padding: 10px 16px;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             transition: background-color 0.2s ease;
+            color: var(--text-color);
         }
-        
+
         .model-option:hover {
             background-color: var(--secondary-color);
         }
-        
+
         .model-option.active {
             background-color: rgba(74, 111, 165, 0.1);
         }
-        
+
         .model-name {
             font-weight: 500;
         }
-        
+
         .model-description {
             font-size: 0.75rem;
             color: var(--light-text);
             margin-top: 2px;
         }
-        
+
+        /* Settings Panel */
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: -350px;
+            width: 300px;
+            height: 100vh;
+            background-color: var(--header-bg);
+            border-left: 1px solid var(--border-color);
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            z-index: 1001;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .settings-panel.open {
+            right: 0;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .settings-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .close-settings {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .settings-section {
+            margin-bottom: 20px;
+        }
+
+        .settings-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .theme-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .theme-option {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .theme-option:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .theme-option.active {
+            background-color: rgba(74, 111, 165, 0.2);
+        }
+
+        .theme-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Chat Container */
         .chat-container {
             flex: 1;
             display: flex;
@@ -151,7 +277,7 @@
             width: 100%;
             height: calc(100vh - 120px);
         }
-        
+
         .welcome-message {
             text-align: center;
             padding: 40px 20px;
@@ -159,14 +285,14 @@
             opacity: 1;
             transition: opacity 0.3s ease;
         }
-        
+
         .welcome-message.hidden {
             opacity: 0;
             height: 0;
             padding: 0;
             overflow: hidden;
         }
-        
+
         .chat-messages {
             flex: 1;
             padding: 20px;
@@ -174,7 +300,7 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         .message {
             margin-bottom: 15px;
             max-width: 80%;
@@ -186,14 +312,14 @@
             transform: translateY(10px);
             animation: messageAppear 0.3s ease forwards;
         }
-        
+
         @keyframes messageAppear {
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        
+
         .user-message {
             align-self: flex-end;
             background-color: var(--primary-color);
@@ -201,22 +327,22 @@
             border-bottom-right-radius: 4px;
             animation-delay: 0.1s;
         }
-        
+
         .ai-message {
             align-self: flex-start;
             background-color: var(--secondary-color);
             border-bottom-left-radius: 4px;
             animation-delay: 0.2s;
         }
-        
+
         .input-container {
             padding: 15px 20px;
-            background-color: white;
+            background-color: var(--input-bg);
             border-top: 1px solid var(--border-color);
             display: flex;
             transition: all 0.3s ease;
         }
-        
+
         #message-input {
             flex: 1;
             padding: 12px 15px;
@@ -225,13 +351,15 @@
             outline: none;
             font-size: 1rem;
             transition: all 0.3s ease;
+            background-color: var(--input-bg);
+            color: var(--text-color);
         }
-        
+
         #message-input:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
         }
-        
+
         #send-button {
             background-color: var(--primary-color);
             color: white;
@@ -243,16 +371,16 @@
             font-size: 1rem;
             transition: all 0.3s ease;
         }
-        
+
         #send-button:hover {
-            background-color: #3a5a80;
+            background-color: var(--primary-light);
             transform: scale(1.05);
         }
-        
+
         #send-button:active {
             transform: scale(0.95);
         }
-        
+
         .typing-indicator {
             display: inline-flex;
             align-items: center;
@@ -266,19 +394,19 @@
             transform: translateY(10px);
             animation: typingAppear 0.3s ease forwards;
         }
-        
+
         @keyframes typingAppear {
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        
+
         .typing-dots {
             display: flex;
             margin-left: 8px;
         }
-        
+
         .typing-dot {
             width: 6px;
             height: 6px;
@@ -287,19 +415,19 @@
             margin: 0 2px;
             animation: typingAnimation 1.4s infinite ease-in-out;
         }
-        
+
         .typing-dot:nth-child(1) {
             animation-delay: 0s;
         }
-        
+
         .typing-dot:nth-child(2) {
             animation-delay: 0.2s;
         }
-        
+
         .typing-dot:nth-child(3) {
             animation-delay: 0.4s;
         }
-        
+
         @keyframes typingAnimation {
             0%, 60%, 100% {
                 transform: translateY(0);
@@ -308,14 +436,14 @@
                 transform: translateY(-5px);
             }
         }
-        
+
         .model-transition {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: white;
+            background-color: var(--bg-color);
             z-index: 1000;
             display: flex;
             flex-direction: column;
@@ -325,12 +453,12 @@
             pointer-events: none;
             transition: opacity 0.5s ease;
         }
-        
+
         .model-transition.active {
             opacity: 1;
             pointer-events: all;
         }
-        
+
         .model-transition-icon {
             width: 60px;
             height: 60px;
@@ -345,7 +473,7 @@
             font-weight: bold;
             animation: pulse 2s infinite ease-in-out;
         }
-        
+
         @keyframes pulse {
             0%, 100% {
                 transform: scale(1);
@@ -354,43 +482,96 @@
                 transform: scale(1.1);
             }
         }
-        
+
         .model-transition-text {
             font-size: 1.2rem;
             color: var(--text-color);
             margin-top: 10px;
+        }
+
+        /* Overlay for when settings are open */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            pointer-events: all;
         }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="logo">BobIsAI</div>
-        <div class="model-selector">
-            <button class="model-dropdown-btn" id="model-dropdown-btn">
-                <span id="current-model-name">BobIsAI</span>
-            </button>
-            <div class="model-dropdown-menu" id="model-dropdown-menu">
-                <div class="model-option" data-model="bob">
-                    <span class="model-name">BobIsAI</span>
-                    <span class="model-description">Ideal for everyday tasks</span>
-                </div>
-                <div class="model-option" data-model="void">
-                    <span class="model-name">VoidAI</span>
-                    <span class="model-description">Advanced and philosophical</span>
-                </div>
-                <div class="model-option" data-model="penguin">
-                    <span class="model-name">PenguinBot</span>
-                    <span class="model-description">Fun and penguin-loving</span>
+        <div class="header-controls">
+            <button class="settings-btn" id="settings-btn">⚙️</button>
+            <div class="model-selector">
+                <button class="model-dropdown-btn" id="model-dropdown-btn">
+                    <span id="current-model-name">BobIsAI</span>
+                </button>
+                <div class="model-dropdown-menu" id="model-dropdown-menu">
+                    <div class="model-option" data-model="bob">
+                        <span class="model-name">BobIsAI</span>
+                        <span class="model-description">Ideal for everyday tasks</span>
+                    </div>
+                    <div class="model-option" data-model="void">
+                        <span class="model-name">VoidAI</span>
+                        <span class="model-description">Advanced and philosophical</span>
+                    </div>
+                    <div class="model-option" data-model="penguin">
+                        <span class="model-name">PenguinBot</span>
+                        <span class="model-description">Fun and penguin-loving</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Settings Panel -->
+    <div class="settings-panel" id="settings-panel">
+        <div class="settings-header">
+            <div class="settings-title">Settings</div>
+            <button class="close-settings" id="close-settings">&times;</button>
+        </div>
+        
+        <div class="settings-section">
+            <div class="settings-section-title">Appearance</div>
+            <div class="theme-options">
+                <div class="theme-option active" data-theme="light">
+                    <div class="theme-icon" style="background: linear-gradient(135deg, #f5f5f5 50%, #333 50%);"></div>
+                    <span>Light Mode</span>
+                </div>
+                <div class="theme-option" data-theme="dark">
+                    <div class="theme-icon" style="background: linear-gradient(135deg, #333 50%, #666 50%);"></div>
+                    <span>Dark Mode</span>
+                </div>
+                <div class="theme-option" data-theme="system">
+                    <div class="theme-icon" style="background: linear-gradient(135deg, #f5f5f5 50%, #333 50%);"></div>
+                    <span>System Default</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
     
+    <!-- Model Transition Screen -->
     <div class="model-transition" id="model-transition">
         <div class="model-transition-icon" id="transition-icon">B</div>
         <div class="model-transition-text">Switching to <span id="transition-model-name">BobIsAI</span></div>
     </div>
     
+    <!-- Chat Container -->
     <div class="chat-container">
         <div class="welcome-message" id="welcome-message">
             <p>Hi, I'm BobIsAI.</p>
@@ -407,6 +588,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
             const messageInput = document.getElementById('message-input');
             const sendButton = document.getElementById('send-button');
             const chatMessages = document.getElementById('chat-messages');
@@ -417,7 +599,12 @@
             const modelTransition = document.getElementById('model-transition');
             const transitionIcon = document.getElementById('transition-icon');
             const transitionModelName = document.getElementById('transition-model-name');
-            
+            const settingsBtn = document.getElementById('settings-btn');
+            const settingsPanel = document.getElementById('settings-panel');
+            const closeSettings = document.getElementById('close-settings');
+            const overlay = document.getElementById('overlay');
+            const themeOptions = document.querySelectorAll('.theme-option');
+
             // AI Personalities
             const personalities = {
                 bob: {
@@ -436,9 +623,10 @@
                     name: "VoidAI",
                     description: "Advanced and philosophical",
                     systemMessage: "You are VoidAI, a cool friend AI that acts cool." +
+                                  "You are made a team called NexuCore, the owner of this Team is Furkan Selim Kucukaslan, and your creator is Reynaldo and NexuCore" +
                                   "You speak friendly, and you use the phrase 'dude' or 'blud' and other Generation Z words" +
                                   "Acts like a cool dude or friend" +
-                                  "His best friend is EchoGPT",
+                                  "Your best friend is EchoGPT",
                     placeholder: "Message VoidAI",
                     welcome: ["Greetings. I am VoidAI.", "What knowledge do you seek from the void?"],
                     icon: "V",
@@ -448,6 +636,7 @@
                     name: "PenguinBot",
                     description: "Fun and penguin-loving",
                     systemMessage: "You are PenguinBot, an adorable AI assistant. " +
+                                  "You are made a team called NexuCore, the owner of this Team is Furkan Selim Kucukaslan, and your creator is Mehmet Inanc and NexuCore" +
                                   "You love all things penguins and often make penguin-related puns. " +
                                   "You're cheerful, polite, and slightly silly. " +
                                   "When asked about yourself, say: 'I'm PenguinBot, waddling through your questions with precision! Slide into my DMs with any queries!'",
@@ -457,10 +646,11 @@
                     color: "#2c3e50"
                 }
             };
-            
+
             // Current personality
             let currentPersonality = 'bob';
-            
+            let currentTheme = localStorage.getItem('bobisai_theme') || 'light';
+
             // Conversation memory
             let conversationHistory = [
                 {
@@ -468,19 +658,47 @@
                     content: personalities.bob.systemMessage
                 }
             ];
-            
+
+            // Initialize theme
+            function applyTheme(theme) {
+                // Remove all theme classes first
+                document.body.classList.remove('dark-mode');
+                
+                if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.body.classList.add('dark-mode');
+                }
+                
+                // Update active theme button
+                themeOptions.forEach(option => {
+                    option.classList.remove('active');
+                    if (option.dataset.theme === theme) {
+                        option.classList.add('active');
+                    }
+                });
+                
+                // Save to localStorage
+                localStorage.setItem('bobisai_theme', theme);
+                currentTheme = theme;
+            }
+
+            // Toggle settings panel
+            function toggleSettings() {
+                settingsPanel.classList.toggle('open');
+                overlay.classList.toggle('active');
+            }
+
             // Toggle dropdown menu
             function toggleDropdown() {
                 modelDropdownMenu.classList.toggle('open');
                 modelDropdownBtn.classList.toggle('open');
             }
-            
+
             // Close dropdown menu
             function closeDropdown() {
                 modelDropdownMenu.classList.remove('open');
                 modelDropdownBtn.classList.remove('open');
             }
-            
+
             // Update UI for current personality
             function updatePersonalityUI() {
                 const personality = personalities[currentPersonality];
@@ -506,7 +724,7 @@
                     }
                 });
             }
-            
+
             // Show model transition animation
             function showModelTransition(newPersonality) {
                 const personality = personalities[newPersonality];
@@ -524,7 +742,7 @@
                     modelTransition.classList.remove('active');
                 }, 1000);
             }
-            
+
             // Change personality
             function changePersonality(personality) {
                 if (personality === currentPersonality) return;
@@ -562,7 +780,7 @@
                     localStorage.removeItem('bobisai_conversation');
                 }, 100);
             }
-            
+
             // Handle sending messages
             function sendMessage() {
                 const message = messageInput.value.trim();
@@ -625,7 +843,7 @@
                     console.error('Error:', error);
                 });
             }
-            
+
             // Add message to chat UI
             function addMessage(text, sender) {
                 const messageDiv = document.createElement('div');
@@ -635,7 +853,7 @@
                 chatMessages.appendChild(messageDiv);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
-            
+
             // Show typing indicator
             function showTypingIndicator() {
                 const typingDiv = document.createElement('div');
@@ -652,7 +870,7 @@
                 chatMessages.appendChild(typingDiv);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
-            
+
             // Hide typing indicator
             function hideTypingIndicator() {
                 const typingIndicator = document.getElementById('typing-indicator');
@@ -660,7 +878,7 @@
                     typingIndicator.remove();
                 }
             }
-            
+
             // Simulate typing effect for AI messages
             function simulateTyping(text, sender) {
                 hideTypingIndicator();
@@ -684,14 +902,14 @@
                 
                 typeWriter();
             }
-            
+
             // Load previous conversation from localStorage
             function loadConversation() {
                 const savedPersonality = localStorage.getItem('bobisai_personality');
                 if (savedPersonality && personalities[savedPersonality]) {
                     currentPersonality = savedPersonality;
                 }
-                
+
                 const savedConversation = localStorage.getItem('bobisai_conversation');
                 if (savedConversation) {
                     conversationHistory = JSON.parse(savedConversation);
@@ -711,7 +929,7 @@
                 // Update UI for current personality
                 updatePersonalityUI();
             }
-            
+
             // Event listeners
             sendButton.addEventListener('click', sendMessage);
             messageInput.addEventListener('keypress', function(e) {
@@ -719,26 +937,48 @@
                     sendMessage();
                 }
             });
-            
+
             // Model dropdown button
             modelDropdownBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 toggleDropdown();
             });
-            
+
             // Model option selection
             document.querySelectorAll('.model-option').forEach(option => {
                 option.addEventListener('click', function() {
                     changePersonality(this.dataset.model);
                 });
             });
-            
+
             // Close dropdown when clicking outside
             document.addEventListener('click', closeDropdown);
-            
+
+            // Settings button
+            settingsBtn.addEventListener('click', toggleSettings);
+            closeSettings.addEventListener('click', toggleSettings);
+            overlay.addEventListener('click', toggleSettings);
+
+            // Theme selection
+            themeOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    applyTheme(this.dataset.theme);
+                });
+            });
+
+            // Check for system theme preference
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                if (currentTheme === 'system') {
+                    applyTheme('system');
+                }
+            });
+
             // Focus input on load
             messageInput.focus();
-            
+
+            // Initialize settings
+            applyTheme(currentTheme);
+
             // Load any previous conversation
             loadConversation();
         });
