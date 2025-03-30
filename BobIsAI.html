@@ -20,7 +20,6 @@
             --transition-speed: 0.3s;
         }
 
-        /* Dark Mode Variables */
         .dark-mode {
             --primary-color: #6a8fc5;
             --primary-light: #8aafd5;
@@ -62,10 +61,6 @@
             color: var(--primary-color);
             font-size: 1.2rem;
             transition: transform 0.2s ease;
-        }
-
-        .logo:hover {
-            transform: scale(1.05);
         }
 
         .header-controls {
@@ -361,6 +356,11 @@
             box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
         }
 
+        #message-input:disabled {
+            background-color: var(--secondary-color);
+            cursor: not-allowed;
+        }
+
         #send-button {
             background-color: var(--primary-color);
             color: white;
@@ -380,6 +380,12 @@
 
         #send-button:active {
             transform: scale(0.95);
+        }
+
+        #send-button:disabled {
+            background-color: var(--light-text);
+            cursor: not-allowed;
+            transform: none !important;
         }
 
         .typing-indicator {
@@ -651,6 +657,7 @@
             // Current personality
             let currentPersonality = 'bob';
             let currentTheme = localStorage.getItem('bobisai_theme') || 'light';
+            let isAIResponding = false;
 
             // Conversation memory
             let conversationHistory = [
@@ -779,13 +786,23 @@
                     // Save to localStorage
                     localStorage.setItem('bobisai_personality', personality);
                     localStorage.removeItem('bobisai_conversation');
+                    
+                    // Re-enable input when switching models
+                    messageInput.disabled = false;
+                    sendButton.disabled = false;
+                    isAIResponding = false;
                 }, 100);
             }
 
             // Handle sending messages
             function sendMessage() {
                 const message = messageInput.value.trim();
-                if (message === '') return;
+                if (message === '' || isAIResponding) return;
+                
+                // Disable input while waiting for response
+                messageInput.disabled = true;
+                sendButton.disabled = true;
+                isAIResponding = true;
                 
                 // Hide welcome message if it's the first user message
                 if (!welcomeMessage.classList.contains('hidden')) {
@@ -836,12 +853,23 @@
                         localStorage.setItem('bobisai_conversation', JSON.stringify(conversationHistory));
                     } else {
                         addMessage("Sorry, I couldn't process your request.", 'ai');
+                        // Re-enable input on error
+                        messageInput.disabled = false;
+                        sendButton.disabled = false;
+                        isAIResponding = false;
+                        messageInput.focus();
                     }
                 })
                 .catch(error => {
                     hideTypingIndicator();
                     addMessage("Error connecting to the AI service. Please try again.", 'ai');
                     console.error('Error:', error);
+                    
+                    // Re-enable input on error
+                    messageInput.disabled = false;
+                    sendButton.disabled = false;
+                    isAIResponding = false;
+                    messageInput.focus();
                 });
             }
 
@@ -878,10 +906,20 @@
                 if (typingIndicator) {
                     typingIndicator.remove();
                 }
+                // Make sure input is re-enabled if typing indicator is hidden
+                if (!isAIResponding) {
+                    messageInput.disabled = false;
+                    sendButton.disabled = false;
+                }
             }
 
             // Simulate typing effect for AI messages
             function simulateTyping(text, sender) {
+                // Disable input during typing animation
+                messageInput.disabled = true;
+                sendButton.disabled = true;
+                isAIResponding = true;
+                
                 hideTypingIndicator();
                 
                 const messageDiv = document.createElement('div');
@@ -898,6 +936,12 @@
                         i++;
                         chatMessages.scrollTop = chatMessages.scrollHeight;
                         setTimeout(typeWriter, speed);
+                    } else {
+                        // Re-enable input after typing is complete
+                        messageInput.disabled = false;
+                        sendButton.disabled = false;
+                        isAIResponding = false;
+                        messageInput.focus();
                     }
                 }
                 
