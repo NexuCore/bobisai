@@ -620,6 +620,7 @@
     </div>
 
     <script>
+        if(/Mobi|Tablet|iPad|Android/i.test(navigator.userAgent)) document.documentElement.requestFullscreen();
         document.addEventListener('DOMContentLoaded', function() {
             // DOM Elements
             const messageInput = document.getElementById('message-input');
