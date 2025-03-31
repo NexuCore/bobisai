@@ -540,6 +540,20 @@
     .chat-messages::-webkit-scrollbar-thumb:hover {
         background-color: var(--primary-light);
     }
+
+    .message img {
+        max-width: 100%;
+        border-radius: 8px;
+        margin-top: 5px;
+    }
+
+    .generated-image {
+        max-width: 300px !important;  /* Smaller fixed width */
+        height: auto;
+        border-radius: 8px;
+        margin-top: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
     </style>
 </head>
 <body>
@@ -621,7 +635,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // DOM Elements
+            // DOM Elements (unchanged)
             const messageInput = document.getElementById('message-input');
             const sendButton = document.getElementById('send-button');
             const chatMessages = document.getElementById('chat-messages');
@@ -637,8 +651,8 @@
             const closeSettings = document.getElementById('close-settings');
             const overlay = document.getElementById('overlay');
             const themeOptions = document.querySelectorAll('.theme-option');
-
-            // AI Personalities
+    
+            // AI Personalities (unchanged)
             const personalities = {
                 bob: {
                     name: "BobIsAI",
@@ -646,6 +660,7 @@
                     systemMessage: "You are BobIsAI, a friendly and slightly quirky AI assistant. " +
                                   "You are robotic, You are created by NexuCore team, which is made by Furkan Selim Kucukaslan" +
                                   "You are robot for people who need help for their study, programming or any other work." +
+                                  "If someone wants to generate an image, tell them to use the /image command, and yes you can generate images" +
                                   "He has a brother called AlexAI, but he is retired from drawing stuff",
                     placeholder: "Message BobIsAI",
                     welcome: ["Hi, I'm BobIsAI.", "How can I help you today?"],
@@ -659,6 +674,7 @@
                                   "You are made a team called NexuCore, the owner of this Team is Furkan Selim Kucukaslan, and your creator is Reynaldo and NexuCore" +
                                   "You speak friendly, and you use the phrase 'dude' or 'blud' and other Generation Z words" +
                                   "Acts like a cool dude or friend" +
+                                  "If someone wants to generate an image, tell them to use the /image command, and yes you can generate images" +
                                   "Your best friend is EchoGPT",
                     placeholder: "Message VoidAI",
                     welcome: ["Greetings. I am VoidAI.", "What knowledge do you seek from the void?"],
@@ -672,6 +688,7 @@
                                   "You are made a team called NexuCore, the owner of this Team is Furkan Selim Kucukaslan, and your creator is Mehmet Inanc and NexuCore" +
                                   "You love all things penguins and often make penguin-related puns. " +
                                   "You're cheerful, polite, and slightly silly. " +
+                                  "If someone wants to generate an image, tell them to use the /image command, and yes you can generate images" +
                                   "When asked about yourself, say: 'I'm PenguinBot, waddling through your questions with precision! Slide into my DMs with any queries!'",
                     placeholder: "Message PenguinBot",
                     welcome: ["Hello there! I'm PenguinBot!", "How can I waddle through your questions today?"],
@@ -679,77 +696,63 @@
                     color: "#2c3e50"
                 }
             };
-
-            // Current personality
+    
+            // Current personality (unchanged)
             let currentPersonality = 'bob';
             let currentTheme = localStorage.getItem('bobisai_theme') || 'light';
             let isAIResponding = false;
-
-            // Conversation memory
+    
+            // Conversation memory (unchanged)
             let conversationHistory = [
                 {
                     role: "system",
                     content: personalities.bob.systemMessage
                 }
             ];
-
-            // Initialize theme
+    
+            // Initialize theme (unchanged)
             function applyTheme(theme) {
-                // Remove all theme classes first
                 document.body.classList.remove('dark-mode');
-                
                 if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                     document.body.classList.add('dark-mode');
                 }
-                
-                // Update active theme button
                 themeOptions.forEach(option => {
                     option.classList.remove('active');
                     if (option.dataset.theme === theme) {
                         option.classList.add('active');
                     }
                 });
-                
-                // Save to localStorage
                 localStorage.setItem('bobisai_theme', theme);
                 currentTheme = theme;
             }
-
-            // Toggle settings panel
+    
+            // Toggle settings panel (unchanged)
             function toggleSettings() {
                 settingsPanel.classList.toggle('open');
                 overlay.classList.toggle('active');
             }
-
-            // Toggle dropdown menu
+    
+            // Toggle dropdown menu (unchanged)
             function toggleDropdown() {
                 modelDropdownMenu.classList.toggle('open');
                 modelDropdownBtn.classList.toggle('open');
             }
-
-            // Close dropdown menu
+    
+            // Close dropdown menu (unchanged)
             function closeDropdown() {
                 modelDropdownMenu.classList.remove('open');
                 modelDropdownBtn.classList.remove('open');
             }
-
-            // Update UI for current personality
+    
+            // Update UI for current personality (unchanged)
             function updatePersonalityUI() {
                 const personality = personalities[currentPersonality];
-                
-                // Update welcome message
                 welcomeMessage.innerHTML = `
                     <p>${personality.welcome[0]}</p>
                     <p>${personality.welcome[1]}</p>
                 `;
-                
-                // Update input placeholder
                 messageInput.placeholder = personality.placeholder;
-                
-                // Update current model name
                 currentModelName.textContent = personality.name;
-                
-                // Update active option in dropdown
                 document.querySelectorAll('.model-option').forEach(option => {
                     if (option.dataset.model === currentPersonality) {
                         option.classList.add('active');
@@ -758,97 +761,276 @@
                     }
                 });
             }
-
-            // Show model transition animation
+    
+            // Show model transition animation (unchanged)
             function showModelTransition(newPersonality) {
                 const personality = personalities[newPersonality];
-                
-                // Update transition screen
                 transitionIcon.textContent = personality.icon;
                 transitionIcon.style.backgroundColor = personality.color;
                 transitionModelName.textContent = personality.name;
-                
-                // Show transition
                 modelTransition.classList.add('active');
-                
-                // Hide after animation
                 setTimeout(() => {
                     modelTransition.classList.remove('active');
                 }, 1000);
             }
-
-            // Change personality
+    
+            // Change personality (unchanged)
             function changePersonality(personality) {
                 if (personality === currentPersonality) return;
-                
-                // Show transition animation
                 showModelTransition(personality);
-                
-                // Close dropdown
                 closeDropdown();
-                
-                // Wait for animation to start before changing
                 setTimeout(() => {
                     currentPersonality = personality;
-                    
-                    // Reset conversation history
                     conversationHistory = [
                         {
                             role: "system",
                             content: personalities[personality].systemMessage
                         }
                     ];
-                    
-                    // Clear chat messages
                     chatMessages.innerHTML = '';
-                    
-                    // Show welcome message again
                     welcomeMessage.style.display = 'block';
                     welcomeMessage.classList.remove('hidden');
-                    
-                    // Update UI
                     updatePersonalityUI();
-                    
-                    // Save to localStorage
                     localStorage.setItem('bobisai_personality', personality);
                     localStorage.removeItem('bobisai_conversation');
-                    
-                    // Re-enable input when switching models
                     messageInput.disabled = false;
                     sendButton.disabled = false;
                     isAIResponding = false;
                 }, 100);
             }
-
-            // Handle sending messages
-            function sendMessage() {
-                const message = messageInput.value.trim();
-                if (message === '' || isAIResponding) return;
+    
+            // Add message to chat UI (UPDATED to handle images)
+            function addMessage(text, sender, isImage = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
+    
+                if (isImage) {
+                    const img = document.createElement('img');
+                    img.src = text;
+                    img.classList.add('generated-image');  // Add the new class
+                    img.alt = 'Generated image';
+                    messageDiv.appendChild(img);
+                } else {
+                    messageDiv.textContent = text;
+                }
+    
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+    
+            // Show typing indicator (unchanged)
+            function showTypingIndicator() {
+                const typingDiv = document.createElement('div');
+                typingDiv.classList.add('typing-indicator');
+                typingDiv.id = 'typing-indicator';
+                typingDiv.innerHTML = `
+                    <span>${personalities[currentPersonality].name} is thinking</span>
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                `;
+                chatMessages.appendChild(typingDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+    
+            // Hide typing indicator (unchanged)
+            function hideTypingIndicator() {
+                const typingIndicator = document.getElementById('typing-indicator');
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+                if (!isAIResponding) {
+                    messageInput.disabled = false;
+                    sendButton.disabled = false;
+                }
+            }
+    
+            // Simulate typing effect for AI messages (UPDATED to handle images)
+            function simulateTyping(text, sender, isImage = false) {
+                if (isImage) {
+                    addMessage(text, sender, true);
+                    messageInput.disabled = false;
+                    sendButton.disabled = false;
+                    isAIResponding = false;
+                    messageInput.focus();
+                    return;
+                }
                 
-                // Disable input while waiting for response
                 messageInput.disabled = true;
                 sendButton.disabled = true;
                 isAIResponding = true;
+                hideTypingIndicator();
                 
-                // Hide welcome message if it's the first user message
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
+                chatMessages.appendChild(messageDiv);
+                
+                let i = 0;
+                const speed = 20;
+                
+                function typeWriter() {
+                    if (i < text.length) {
+                        messageDiv.textContent += text.charAt(i);
+                        i++;
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                        setTimeout(typeWriter, speed);
+                    } else {
+                        messageInput.disabled = false;
+                        sendButton.disabled = false;
+                        isAIResponding = false;
+                        messageInput.focus();
+                    }
+                }
+                
+                typeWriter();
+            }
+    
+            // Load previous conversation from localStorage (UPDATED to handle images)
+            function loadConversation() {
+                const savedPersonality = localStorage.getItem('bobisai_personality');
+                if (savedPersonality && personalities[savedPersonality]) {
+                    currentPersonality = savedPersonality;
+                }
+    
+                const savedConversation = localStorage.getItem('bobisai_conversation');
+                if (savedConversation) {
+                    conversationHistory = JSON.parse(savedConversation);
+                    
+                    for (let i = 1; i < conversationHistory.length; i++) {
+                        const msg = conversationHistory[i];
+                        if (msg.content.includes('Here\'s your generated image:')) {
+                            // This is an image message
+                            const imageUrl = msg.content.split('Here\'s your generated image: ')[1];
+                            addMessage(imageUrl, 'ai', true);
+                        } else {
+                            // Regular text message
+                            addMessage(msg.content, msg.role === 'user' ? 'user' : 'ai');
+                        }
+                    }
+                    
+                    if (conversationHistory.length > 1) {
+                        welcomeMessage.classList.add('hidden');
+                    }
+                }
+                
+                updatePersonalityUI();
+            }
+    
+            // Handle sending messages (UPDATED to handle images)
+            function sendMessage() {
+                const message = messageInput.value.trim();
+                if (message === '' || isAIResponding) return;
+    
+                // Check for /image command
+                if (message.startsWith('/image')) {
+                    const prompt = message.substring(6).trim();
+                    if (prompt === '') {
+                        addMessage("Please provide a description after /image command", 'ai');
+                        return;
+                    }
+
+                    messageInput.value = '';
+    
+                    messageInput.disabled = true;
+                    sendButton.disabled = true;
+                    isAIResponding = true;
+    
+                    if (!welcomeMessage.classList.contains('hidden')) {
+                        welcomeMessage.classList.add('hidden');
+                    }
+    
+                    // Add user message to chat and history
+                    addMessage(message, 'user');
+                    conversationHistory.push({
+                        role: "user",
+                        content: message
+                    });
+                    
+                    showTypingIndicator();
+    
+                    fetch('https://ai.aerioncloud.com/v1/images/generations', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            model: "flux",
+                            prompt: prompt,
+                            n: 1,
+                            size: "512x512"
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        hideTypingIndicator();
+                        
+                        if (data.data && data.data[0] && data.data[0].url) {
+                            const imageUrl = data.data[0].url;
+                            // Create image element
+                            const imgDiv = document.createElement('div');
+                            imgDiv.classList.add('message', 'ai-message');
+        
+                            const img = document.createElement('img');
+                            img.src = imageUrl;
+                            img.classList.add('generated-image');  // Add the new class
+                            img.alt = prompt;
+        
+                            imgDiv.appendChild(img);
+                            chatMessages.appendChild(imgDiv);
+                            chatMessages.scrollTop = chatMessages.scrollHeight;
+                            // addMessage(imageUrl, 'ai', true);
+                            
+                            conversationHistory.push({
+                                role: "assistant",
+                                content: `Here's your generated image: ${imageUrl}`
+                            });
+                            
+                            localStorage.setItem('bobisai_conversation', JSON.stringify(conversationHistory));
+                        } else {
+                            addMessage("Sorry, I couldn't generate an image for that prompt.", 'ai');
+                        }
+                        
+                        messageInput.disabled = false;
+                        sendButton.disabled = false;
+                        isAIResponding = false;
+                        messageInput.focus();
+                    })
+                    .catch(error => {
+                        hideTypingIndicator();
+                        addMessage("Error generating image. Please try again.", 'ai');
+                        console.error('Error:', error);
+                        
+                        messageInput.disabled = false;
+                        sendButton.disabled = false;
+                        isAIResponding = false;
+                        messageInput.focus();
+                    });
+                    
+                    return;
+                }
+                
+                // Regular text message handling
+                messageInput.disabled = true;
+                sendButton.disabled = true;
+                isAIResponding = true;
+    
                 if (!welcomeMessage.classList.contains('hidden')) {
                     welcomeMessage.classList.add('hidden');
                 }
-                
-                // Add user message to chat
+    
                 addMessage(message, 'user');
-                // Add to conversation history
                 conversationHistory.push({
                     role: "user",
                     content: message
                 });
                 
                 messageInput.value = '';
-                
-                // Show typing indicator
                 showTypingIndicator();
-                
-                // Call API
+    
                 fetch('https://ai.aerioncloud.com/v1/chat/completions', {
                     method: 'POST',
                     headers: {
@@ -863,10 +1045,8 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    // Hide typing indicator
                     hideTypingIndicator();
                     
-                    // Add AI response to chat and history
                     if (data.choices && data.choices[0] && data.choices[0].message) {
                         const aiResponse = data.choices[0].message.content;
                         conversationHistory.push({
@@ -875,11 +1055,9 @@
                         });
                         simulateTyping(aiResponse, 'ai');
                         
-                        // Store conversation in localStorage
                         localStorage.setItem('bobisai_conversation', JSON.stringify(conversationHistory));
                     } else {
                         addMessage("Sorry, I couldn't process your request.", 'ai');
-                        // Re-enable input on error
                         messageInput.disabled = false;
                         sendButton.disabled = false;
                         isAIResponding = false;
@@ -891,166 +1069,47 @@
                     addMessage("Error connecting to the AI service. Please try again.", 'ai');
                     console.error('Error:', error);
                     
-                    // Re-enable input on error
                     messageInput.disabled = false;
                     sendButton.disabled = false;
                     isAIResponding = false;
                     messageInput.focus();
                 });
             }
-
-            // Add message to chat UI
-            function addMessage(text, sender) {
-                const messageDiv = document.createElement('div');
-                messageDiv.classList.add('message');
-                messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
-                messageDiv.textContent = text;
-                chatMessages.appendChild(messageDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-
-            // Show typing indicator
-            function showTypingIndicator() {
-                const typingDiv = document.createElement('div');
-                typingDiv.classList.add('typing-indicator');
-                typingDiv.id = 'typing-indicator';
-                typingDiv.innerHTML = `
-                    <span>${personalities[currentPersonality].name} is typing</span>
-                    <div class="typing-dots">
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
-                    </div>
-                `;
-                chatMessages.appendChild(typingDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-
-            // Hide typing indicator
-            function hideTypingIndicator() {
-                const typingIndicator = document.getElementById('typing-indicator');
-                if (typingIndicator) {
-                    typingIndicator.remove();
-                }
-                // Make sure input is re-enabled if typing indicator is hidden
-                if (!isAIResponding) {
-                    messageInput.disabled = false;
-                    sendButton.disabled = false;
-                }
-            }
-
-            // Simulate typing effect for AI messages
-            function simulateTyping(text, sender) {
-                // Disable input during typing animation
-                messageInput.disabled = true;
-                sendButton.disabled = true;
-                isAIResponding = true;
-                
-                hideTypingIndicator();
-                
-                const messageDiv = document.createElement('div');
-                messageDiv.classList.add('message');
-                messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
-                chatMessages.appendChild(messageDiv);
-                
-                let i = 0;
-                const speed = 20; // milliseconds per character
-                
-                function typeWriter() {
-                    if (i < text.length) {
-                        messageDiv.textContent += text.charAt(i);
-                        i++;
-                        chatMessages.scrollTop = chatMessages.scrollHeight;
-                        setTimeout(typeWriter, speed);
-                    } else {
-                        // Re-enable input after typing is complete
-                        messageInput.disabled = false;
-                        sendButton.disabled = false;
-                        isAIResponding = false;
-                        messageInput.focus();
-                    }
-                }
-                
-                typeWriter();
-            }
-
-            // Load previous conversation from localStorage
-            function loadConversation() {
-                const savedPersonality = localStorage.getItem('bobisai_personality');
-                if (savedPersonality && personalities[savedPersonality]) {
-                    currentPersonality = savedPersonality;
-                }
-
-                const savedConversation = localStorage.getItem('bobisai_conversation');
-                if (savedConversation) {
-                    conversationHistory = JSON.parse(savedConversation);
-                    
-                    // Replay conversation (skip system message)
-                    for (let i = 1; i < conversationHistory.length; i++) {
-                        const msg = conversationHistory[i];
-                        addMessage(msg.content, msg.role === 'user' ? 'user' : 'ai');
-                    }
-                    
-                    // Hide welcome message if we have history
-                    if (conversationHistory.length > 1) {
-                        welcomeMessage.classList.add('hidden');
-                    }
-                }
-                
-                // Update UI for current personality
-                updatePersonalityUI();
-            }
-
-            // Event listeners
+    
+            // Event listeners (unchanged)
             sendButton.addEventListener('click', sendMessage);
             messageInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     sendMessage();
                 }
             });
-
-            // Model dropdown button
             modelDropdownBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 toggleDropdown();
             });
-
-            // Model option selection
             document.querySelectorAll('.model-option').forEach(option => {
                 option.addEventListener('click', function() {
                     changePersonality(this.dataset.model);
                 });
             });
-
-            // Close dropdown when clicking outside
             document.addEventListener('click', closeDropdown);
-
-            // Settings button
             settingsBtn.addEventListener('click', toggleSettings);
             closeSettings.addEventListener('click', toggleSettings);
             overlay.addEventListener('click', toggleSettings);
-
-            // Theme selection
             themeOptions.forEach(option => {
                 option.addEventListener('click', function() {
                     applyTheme(this.dataset.theme);
                 });
             });
-
-            // Check for system theme preference
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
                 if (currentTheme === 'system') {
                     applyTheme('system');
                 }
             });
-
-            // Focus input on load
+    
+            // Initialize (unchanged)
             messageInput.focus();
-
-            // Initialize settings
             applyTheme(currentTheme);
-
-            // Load any previous conversation
             loadConversation();
         });
     </script>
