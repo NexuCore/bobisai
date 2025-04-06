@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wikipedia - AlexAI</title>
+    <style>
+        /* Character Infobox Styling */
+        .infobox.character {
+            border: 1px solid #a2a9b1;
+            background-color: #f8f9fa;
+            margin: 0.5em 0 1em 1em;
+            float: right;
+            clear: right;
+            width: 300px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .infobox-title {
+            background-color: #2c4a6e;
+            color: white;
+            text-align: center;
+            padding: 5px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .infobox-image {
+            text-align: center;
+            padding: 5px;
+        }
+
+        .infobox-image img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        #image-caption {
+            font-size: 12px;
+            color: #54595d;
+            padding: 2px;
+        }
+
+        .infobox-data {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .infobox-data th, .infobox-data td {
+            border: 1px solid #a2a9b1;
+            padding: 5px;
+            vertical-align: top;
+        }
+
+        .infobox-data th {
+            background-color: #eaecf0;
+            text-align: left;
+            width: 40%;
+        }
+
+        /* Story Content Styling */
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #222;
+        }
+
+        .story-title {
+            font-size: 24px;
+            border-bottom: 1px solid #a2a9b1;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+
+        .story-content {
+            text-align: justify;
+            margin-bottom: 20px;
+        }
+
+        /* Clear float after infobox */
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+    </style>
+</head>
+<body>
+    <div class="content clearfix">
+        <div class="infobox character">
+            <div class="infobox-title">Character</div>
+            <div class="infobox-image">
+                <img id="character-image" src="https://via.placeholder.com/300x400?text=No+Image" alt="Character Image">
+                <div id="image-caption">No caption available.</div>
+            </div>
+            <table class="infobox-data">
+                <tr>
+                    <th>Name</th>
+                    <td id="name">Unknown</td>
+                </tr>
+                <tr>
+                    <th>Creator</th>
+                    <td id="creator">Unknown</td>
+                </tr>
+                <tr>
+                    <th>Gender</th>
+                    <td id="gender">Unknown</td>
+                </tr>
+                <tr>
+                    <th>Species</th>
+                    <td id="species">Unknown</td>
+                </tr>
+                <tr>
+                    <th>Birthday</th>
+                    <td id="birthday">Unknown</td>
+                </tr>
+                <tr>
+                    <th>Died</th>
+                    <td id="died">Unknown</td>
+                </tr>
+                <tr>
+                  <th>Siblings</th>
+                  <td id="siblings">Unknown</td>
+              </tr>
+              <tr>
+                  <th>Friends</th>
+                  <td id="friends">Unknown</td>
+              </tr>
+              <tr>
+                  <th>Enemies</th>
+                  <td id="enemies">Unknown</td>
+              </tr>
+              <tr>
+                <th>Limited</th>
+                <td id="limited">Unknown</td>
+            </tr>
+            </table>
+        </div>
+
+        <h1 class="story-title" id="story-title">Character Biography</h1>
+        <div class="story-content" id="story-content">
+            <p>The story of this character has not been written yet.</p>
+        </div>
+    </div>
+
+    <script>
+        // Character data including story
+        document.addEventListener('DOMContentLoaded', function() {
+            const characterData = {
+                name: "AlexAI",
+                creator: "Dorcioman Alexander",
+                gender: "Male",
+                species: "Robot, AI, Cat",
+                birthday: "June 29, 2024",
+                died: "April 3, 2025",
+                image: "https://nexucore.github.io/bobisai/assets/AlexAI%20Body.png",
+                caption: "AlexAI from the old website 'BobIsAI'",
+                storyTitle: "Information about AlexAI",
+                siblings: "BobIsAI",
+                friends: "VoidAI, PenguinBot",
+                enemies: "EchoGPT",
+                limited: "No",
+                storyContent: `
+                  AlexAI is the little bro of BobIsAI. He loved to draw art for the users of BobIsAI, but one day, the NexuCore team killed them by deleting his soul and brain. They also had to remove the memories of all the AIs that saw AlexAI get killed. SO they will not share this information. If you ask who I am.. well.. I am EchoGPT who is writting stuff, because they forgot to remove my memory, and I saw everything...
+                `
+            };
+
+            // Apply data to the infobox
+            document.getElementById('name').textContent = characterData.name;
+            document.getElementById('creator').textContent = characterData.creator;
+            document.getElementById('gender').textContent = characterData.gender;
+            document.getElementById('species').textContent = characterData.species;
+            document.getElementById('birthday').textContent = characterData.birthday;
+            document.getElementById('died').textContent = characterData.died;
+            document.getElementById('character-image').src = characterData.image;
+            document.getElementById('character-image').alt = characterData.name + " image";
+            document.getElementById('image-caption').textContent = characterData.caption;
+            document.getElementById('siblings').textContent = characterData.siblings;
+            document.getElementById('friends').textContent = characterData.friends;
+            document.getElementById('enemies').textContent = characterData.enemies;
+            document.getElementById('limited').textContent = characterData.limited;
+
+            // Apply story content
+            document.getElementById('story-title').textContent = characterData.storyTitle;
+            document.getElementById('story-content').innerHTML = characterData.storyContent;
+        });
+    </script>
+</body>
+</html>
