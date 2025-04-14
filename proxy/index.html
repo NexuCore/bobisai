@@ -24,6 +24,13 @@
             border-left: 6px solid #2196F3;
             margin: 20px 0;
         }
+        #debug {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff3cd;
+            border-left: 6px solid #ffc107;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -38,19 +45,41 @@
         <p><strong>Request Body:</strong> <code>{"message": "Your message here"}</code></p>
     </div>
 
-    <h2>How to Use</h2>
-    <p>Send a POST request to this page with a JSON body containing your message. The response will contain the AI's reply.</p>
-    
-    <h3>Example using curl:</h3>
-    <pre>
-curl -X POST \
-  -H "Content-Type: application/json" \
-  -d '{"message":"Hello"}' \
-  [YOUR_PAGE_URL_HERE]
-    </pre>
+    <button onclick="testWebhook()">Test Webhook Locally</button>
+    <div id="debug"></div>
 
     <script>
-        // Handle incoming POST requests
+        async function callAI(message) {
+            try {
+                const response = await fetch('https://ai.aerioncloud.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        model: "deepseek-r1",
+                        messages: [{
+                            role: "user",
+                            content: message
+                        }],
+                        temperature: 0.7,
+                        max_tokens: 1000
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data.choices[0].message.content;
+            } catch (error) {
+                console.error('AI API Error:', error);
+                throw error;
+            }
+        }
+
         async function handleRequest(request) {
             if (request.method === 'POST') {
                 try {
@@ -63,49 +92,70 @@ curl -X POST \
                         });
                     }
                     
-                    // Call the AI endpoint
-                    const aiResponse = await fetch('https://ai.aerioncloud.com/v1/chat/completions', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            model: "deepseek-r1",
-                            messages: [
-                                {
-                                    role: "user",
-                                    content: data.message
-                                }
-                            ]
-                        })
-                    });
+                    const aiResponse = await callAI(data.message);
                     
-                    if (!aiResponse.ok) {
-                        throw new Error(`AI API responded with status ${aiResponse.status}`);
-                    }
-                    
-                    const aiData = await aiResponse.json();
-                    
-                    return new Response(JSON.stringify({ response: aiData.choices[0].message.content }), {
+                    return new Response(JSON.stringify({ response: aiResponse }), {
                         headers: { 'Content-Type': 'application/json' }
                     });
                     
                 } catch (error) {
-                    return new Response(JSON.stringify({ error: error.message }), {
+                    return new Response(JSON.stringify({ 
+                        error: error.message,
+                        details: "Check if the AI endpoint is available and CORS is properly configured"
+                    }), {
                         status: 500,
                         headers: { 'Content-Type': 'application/json' }
                     });
                 }
             }
             
-            // For GET requests, return the HTML page
             return new Response(null, {
                 status: 200,
                 headers: { 'Content-Type': 'text/html' }
             });
         }
-        
-        // Listen for fetch events (this will work on Cloudflare Workers, Service Workers, etc.)
+
+        // Test function for debugging
+        async function testWebhook() {
+            const debugDiv = document.getElementById('debug');
+            debugDiv.style.display = 'block';
+            debugDiv.innerHTML = '<p>Testing connection to AI endpoint...</p>';
+
+            try {
+                const testMessage = "Hello, how are you?";
+                debugDiv.innerHTML += `<p>Sending test message: "${testMessage}"</p>`;
+                
+                const startTime = Date.now();
+                const response = await callAI(testMessage);
+                const duration = Date.now() - startTime;
+                
+                debugDiv.innerHTML += `
+                    <p><strong>Success!</strong> Received response in ${duration}ms</p>
+                    <p><strong>AI Response:</strong> ${response}</p>
+                    <p>If this test works but your webhook doesn't, check:</p>
+                    <ul>
+                        <li>Your webhook URL is correct</li>
+                        <li>You're sending a POST request</li>
+                        <li>Your Content-Type header is set to application/json</li>
+                        <li>Your request body contains a "message" field</li>
+                    </ul>
+                `;
+            } catch (error) {
+                debugDiv.innerHTML += `
+                    <p><strong>Error:</strong> ${error.message}</p>
+                    <p>Troubleshooting steps:</p>
+                    <ol>
+                        <li>Check your internet connection</li>
+                        <li>Verify the AI endpoint is available: <a href="https://ai.aerioncloud.com/v1/chat/completions" target="_blank">Test endpoint</a></li>
+                        <li>Check browser console for CORS errors (F12 > Console)</li>
+                        <li>Try from a different network (might be blocked by firewall)</li>
+                    </ol>
+                    <p>If you're seeing CORS errors, you'll need to deploy this as a server-side solution.</p>
+                `;
+            }
+        }
+
+        // Service Worker-like functionality
         if (typeof addEventListener === 'function') {
             addEventListener('fetch', event => {
                 event.respondWith(handleRequest(event.request));
