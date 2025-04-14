@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Webhook Endpoint</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .endpoint {
+            background: #e7f3fe;
+            padding: 15px;
+            border-left: 6px solid #2196F3;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI Webhook Endpoint</h1>
+    <p>This page acts as a webhook that processes incoming messages through the DeepSeek R1 model.</p>
+    
+    <div class="endpoint">
+        <h2>Endpoint Information</h2>
+        <p><strong>URL:</strong> This page's URL</p>
+        <p><strong>Method:</strong> POST</p>
+        <p><strong>Content-Type:</strong> application/json</p>
+        <p><strong>Request Body:</strong> <code>{"message": "Your message here"}</code></p>
+    </div>
+
+    <h2>How to Use</h2>
+    <p>Send a POST request to this page with a JSON body containing your message. The response will contain the AI's reply.</p>
+    
+    <h3>Example using curl:</h3>
+    <pre>
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"message":"Hello"}' \
+  [YOUR_PAGE_URL_HERE]
+    </pre>
+
+    <script>
+        // Handle incoming POST requests
+        async function handleRequest(request) {
+            if (request.method === 'POST') {
+                try {
+                    const data = await request.json();
+                    
+                    if (!data.message) {
+                        return new Response(JSON.stringify({ error: "Message field is required" }), {
+                            status: 400,
+                            headers: { 'Content-Type': 'application/json' }
+                        });
+                    }
+                    
+                    // Call the AI endpoint
+                    const aiResponse = await fetch('https://ai.aerioncloud.com/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            model: "deepseek-r1",
+                            messages: [
+                                {
+                                    role: "user",
+                                    content: data.message
+                                }
+                            ]
+                        })
+                    });
+                    
+                    if (!aiResponse.ok) {
+                        throw new Error(`AI API responded with status ${aiResponse.status}`);
+                    }
+                    
+                    const aiData = await aiResponse.json();
+                    
+                    return new Response(JSON.stringify({ response: aiData.choices[0].message.content }), {
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    
+                } catch (error) {
+                    return new Response(JSON.stringify({ error: error.message }), {
+                        status: 500,
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                }
+            }
+            
+            // For GET requests, return the HTML page
+            return new Response(null, {
+                status: 200,
+                headers: { 'Content-Type': 'text/html' }
+            });
+        }
+        
+        // Listen for fetch events (this will work on Cloudflare Workers, Service Workers, etc.)
+        if (typeof addEventListener === 'function') {
+            addEventListener('fetch', event => {
+                event.respondWith(handleRequest(event.request));
+            });
+        }
+    </script>
+</body>
+</html>
