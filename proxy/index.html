@@ -12,151 +12,112 @@
             padding: 20px;
             line-height: 1.6;
         }
-        pre {
-            background: #f4f4f4;
-            padding: 10px;
-            border-radius: 5px;
-            overflow-x: auto;
-        }
-        .endpoint {
-            background: #e7f3fe;
-            padding: 15px;
-            border-left: 6px solid #2196F3;
-            margin: 20px 0;
-        }
-        #debug {
+        .container {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
             margin-top: 20px;
-            padding: 15px;
-            background: #fff3cd;
-            border-left: 6px solid #ffc107;
-            display: none;
+        }
+        pre {
+            background-color: #eee;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
         }
     </style>
 </head>
 <body>
     <h1>AI Webhook Endpoint</h1>
-    <p>This page acts as a webhook that processes incoming messages through the DeepSeek R1 model.</p>
+    <p>This page acts as a webhook that forwards messages to the BobIsAI's AI API and returns the response.</p>
     
-    <div class="endpoint">
-        <h2>Endpoint Information</h2>
-        <p><strong>URL:</strong> This page's URL</p>
-        <p><strong>Method:</strong> POST</p>
-        <p><strong>Content-Type:</strong> application/json</p>
-        <p><strong>Request Body:</strong> <code>{"message": "Your message here"}</code></p>
+    <div class="container">
+        <h2>Test the Webhook</h2>
+        <input type="text" id="messageInput" placeholder="Enter your message" style="width: 70%; padding: 8px;">
+        <button onclick="testWebhook()">Send</button>
+        <div id="responseContainer" style="margin-top: 20px;"></div>
     </div>
 
-    <button onclick="testWebhook()">Test Webhook Locally</button>
-    <div id="debug"></div>
+    <div class="container">
+        <h2>How to Use</h2>
+        <p>Send a POST request to this page's URL with a JSON body containing your message:</p>
+        <pre>{
+    "message": "Your message here"
+}</pre>
+        <p>The webhook will respond with the AI's reply.</p>
+    </div>
 
     <script>
-        async function callAI(message) {
-            try {
-                const response = await fetch('https://ai.aerioncloud.com/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        model: "deepseek-r1",
-                        messages: [{
-                            role: "user",
-                            content: message
-                        }],
-                        temperature: 0.7,
-                        max_tokens: 1000
-                    })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                return data.choices[0].message.content;
-            } catch (error) {
-                console.error('AI API Error:', error);
-                throw error;
-            }
-        }
-
+        // Handle incoming POST requests
         async function handleRequest(request) {
             if (request.method === 'POST') {
                 try {
                     const data = await request.json();
+                    const userMessage = data.message || "Hello";
                     
-                    if (!data.message) {
-                        return new Response(JSON.stringify({ error: "Message field is required" }), {
-                            status: 400,
-                            headers: { 'Content-Type': 'application/json' }
-                        });
-                    }
+                    // Call the Penguinai API
+                    const aiResponse = await callPenguinAI(userMessage);
                     
-                    const aiResponse = await callAI(data.message);
-                    
-                    return new Response(JSON.stringify({ response: aiResponse }), {
+                    return new Response(JSON.stringify({
+                        response: aiResponse
+                    }), {
                         headers: { 'Content-Type': 'application/json' }
                     });
-                    
                 } catch (error) {
-                    return new Response(JSON.stringify({ 
-                        error: error.message,
-                        details: "Check if the AI endpoint is available and CORS is properly configured"
+                    return new Response(JSON.stringify({
+                        error: error.message
                     }), {
                         status: 500,
                         headers: { 'Content-Type': 'application/json' }
                     });
                 }
+            } else {
+                // For GET requests, just return the HTML page
+                return new Response(null, {
+                    status: 200,
+                    headers: { 'Content-Type': 'text/html' }
+                });
             }
-            
-            return new Response(null, {
-                status: 200,
-                headers: { 'Content-Type': 'text/html' }
+        }
+
+        // Function to call the Penguinai API
+        async function callPenguinAI(message) {
+            const response = await fetch('https://penguinai.derpygamer2142.com/v1', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: "llama-3.2-3b-instruct",
+                    messages: [
+                        {
+                            role: "user",
+                            content: message
+                        }
+                    ]
+                })
             });
+
+            const data = await response.json();
+            return data.choices[0].message.content;
         }
 
-        // Test function for debugging
+        // Test function for the demo interface
         async function testWebhook() {
-            const debugDiv = document.getElementById('debug');
-            debugDiv.style.display = 'block';
-            debugDiv.innerHTML = '<p>Testing connection to AI endpoint...</p>';
-
+            const message = document.getElementById('messageInput').value || "Hello";
+            const responseContainer = document.getElementById('responseContainer');
+            
+            responseContainer.innerHTML = '<p>Sending request...</p>';
+            
             try {
-                const testMessage = "Hello, how are you?";
-                debugDiv.innerHTML += `<p>Sending test message: "${testMessage}"</p>`;
-                
-                const startTime = Date.now();
-                const response = await callAI(testMessage);
-                const duration = Date.now() - startTime;
-                
-                debugDiv.innerHTML += `
-                    <p><strong>Success!</strong> Received response in ${duration}ms</p>
-                    <p><strong>AI Response:</strong> ${response}</p>
-                    <p>If this test works but your webhook doesn't, check:</p>
-                    <ul>
-                        <li>Your webhook URL is correct</li>
-                        <li>You're sending a POST request</li>
-                        <li>Your Content-Type header is set to application/json</li>
-                        <li>Your request body contains a "message" field</li>
-                    </ul>
-                `;
+                const response = await callPenguinAI(message);
+                responseContainer.innerHTML = `<p><strong>AI Response:</strong> ${response}</p>`;
             } catch (error) {
-                debugDiv.innerHTML += `
-                    <p><strong>Error:</strong> ${error.message}</p>
-                    <p>Troubleshooting steps:</p>
-                    <ol>
-                        <li>Check your internet connection</li>
-                        <li>Verify the AI endpoint is available: <a href="https://ai.aerioncloud.com/v1/chat/completions" target="_blank">Test endpoint</a></li>
-                        <li>Check browser console for CORS errors (F12 > Console)</li>
-                        <li>Try from a different network (might be blocked by firewall)</li>
-                    </ol>
-                    <p>If you're seeing CORS errors, you'll need to deploy this as a server-side solution.</p>
-                `;
+                responseContainer.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
             }
         }
 
-        // Service Worker-like functionality
-        if (typeof addEventListener === 'function') {
+        // If this is running in a Service Worker context (like on Glitch)
+        if (typeof addEventListener === 'function' && typeof fetch === 'function') {
             addEventListener('fetch', event => {
                 event.respondWith(handleRequest(event.request));
             });
