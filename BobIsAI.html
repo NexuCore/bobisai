@@ -1149,13 +1149,13 @@
                 messageInput.value = '';
                 showTypingIndicator();
     
-                fetch('https://ai.aerioncloud.com/v1/chat/completions', {
+                fetch('https://penguinai.derpygamer2142.com/v1/chat/completions', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        model: "deepseek-r1",
+                        model: "llama-3.2-11b-vision-instruct",
                         messages: conversationHistory,
                         temperature: 0.7,
                         max_tokens: 2048
