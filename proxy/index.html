@@ -28,7 +28,7 @@
 </head>
 <body>
     <h1>AI Webhook Endpoint</h1>
-    <p>This page acts as a webhook that forwards messages to the BobIsAI's AI API and returns the response.</p>
+    <p>This page acts as a webhook that forwards messages to Penguinai API and returns the response.</p>
     
     <div class="container">
         <h2>Test the Webhook</h2>
@@ -64,7 +64,8 @@
                     });
                 } catch (error) {
                     return new Response(JSON.stringify({
-                        error: error.message
+                        error: error.message,
+                        details: "Check if the API endpoint is correct and accessible"
                     }), {
                         status: 500,
                         headers: { 'Content-Type': 'application/json' }
@@ -81,24 +82,48 @@
 
         // Function to call the Penguinai API
         async function callPenguinAI(message) {
-            const response = await fetch('https://penguinai.derpygamer2142.com/v1', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    model: "llama-3.2-3b-instruct",
-                    messages: [
-                        {
-                            role: "user",
-                            content: message
-                        }
-                    ]
-                })
-            });
+            const apiUrl = 'https://penguinai.derpygamer2142.com/v1/chat/completions';
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: "llama-3.2-3b-instruct",
+                        messages: [
+                            {
+                                role: "user",
+                                content: message
+                            }
+                        ]
+                    })
+                });
 
-            const data = await response.json();
-            return data.choices[0].message.content;
+                if (!response.ok) {
+                    throw new Error(`API request failed with status ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // Handle different possible response formats
+                if (data.choices && data.choices.length > 0 && data.choices[0].message) {
+                    return data.choices[0].message.content;
+                } else if (data.message) {
+                    return data.message;
+                } else {
+                    console.log('Full API response:', data);
+                    throw new Error('Unexpected API response format');
+                }
+            } catch (error) {
+                console.error('Error calling Penguinai API:', {
+                    error: error,
+                    endpoint: apiUrl,
+                    timestamp: new Date().toISOString()
+                });
+                throw error;
+            }
         }
 
         // Test function for the demo interface
@@ -106,13 +131,26 @@
             const message = document.getElementById('messageInput').value || "Hello";
             const responseContainer = document.getElementById('responseContainer');
             
-            responseContainer.innerHTML = '<p>Sending request...</p>';
+            responseContainer.innerHTML = '<p>Sending request to Penguinai API...</p>';
             
             try {
                 const response = await callPenguinAI(message);
-                responseContainer.innerHTML = `<p><strong>AI Response:</strong> ${response}</p>`;
+                responseContainer.innerHTML = `
+                    <p><strong>Your message:</strong> ${message}</p>
+                    <p><strong>AI Response:</strong> ${response}</p>
+                    <p><small>Endpoint used: https://penguinai.derpygamer2142.com/v1/chat/completions</small></p>
+                `;
             } catch (error) {
-                responseContainer.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+                responseContainer.innerHTML = `
+                    <p style="color: red;"><strong>Error:</strong> ${error.message}</p>
+                    <p>Please check:</p>
+                    <ul>
+                        <li>Is the API endpoint correct?</li>
+                        <li>Is the service currently available?</li>
+                        <li>Check browser console for details</li>
+                    </ul>
+                `;
+                console.error('Webhook test error:', error);
             }
         }
 
