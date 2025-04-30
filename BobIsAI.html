@@ -1143,14 +1143,30 @@
                     hideTypingIndicator();
                     
                     if (data.choices && data.choices[0] && data.choices[0].message) {
-                        const aiResponse = data.choices[0].message.content;
-                        conversationHistory.push({
-                            role: "assistant",
-                            content: aiResponse
-                        });
-                        simulateTyping(aiResponse, 'ai');
-                        
-                        localStorage.setItem('bobisai_conversation', JSON.stringify(conversationHistory));
+                        if (data.choices && data.choices[0] && data.choices[0].message) {
+    let aiResponse = data.choices[0].message.content;
+    
+    // Remove everything after --- if it exists
+    if (aiResponse.includes('---')) {
+        aiResponse = aiResponse.split('---')[0].trim();
+    }
+    
+    // Remove pollinations.ai links
+    aiResponse = aiResponse.replace(/\[Learn more\]\(https:\/\/pollinations\.ai\/[^)]*\)/gi, '');
+    aiResponse = aiResponse.replace(/https:\/\/pollinations\.ai\/[^\s)]*/gi, '');
+    aiResponse = aiResponse.replace(/\[([^\]]+)\]\(https:\/\/pollinations\.ai\/[^)]*\)/gi, '$1');
+    
+    // Clean up any double newlines or spaces left after removal
+    aiResponse = aiResponse.replace(/\n\s*\n/g, '\n').trim();
+    
+    conversationHistory.push({
+        role: "assistant",
+        content: aiResponse
+    });
+    simulateTyping(aiResponse, 'ai');
+    
+    localStorage.setItem('bobisai_conversation', JSON.stringify(conversationHistory));
+}
                     } else {
                         showTypingIndicator();
                             // Retry logic (max 2 retries)
