@@ -906,11 +906,11 @@
     typingDiv.classList.add('typing-indicator');
     typingDiv.id = 'typing-indicator';
     
-    // Check if the last user message contains /image command
-    const isGeneratingImage = conversationHistory.some(msg => 
-        msg.role === "user" && 
-        msg.content.trim().startsWith('/image')
-    );
+    // Check only the last message for /image command
+    const lastMessage = conversationHistory[conversationHistory.length - 1];
+    const isGeneratingImage = lastMessage && 
+                             lastMessage.role === "user" && 
+                             lastMessage.content.trim().startsWith('/image');
     
     const statusText = isGeneratingImage 
         ? `${personalities[currentPersonality].name} is generating an image` 
