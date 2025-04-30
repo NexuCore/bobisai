@@ -902,20 +902,32 @@
     
             // Show typing indicator (unchanged)
             function showTypingIndicator() {
-                const typingDiv = document.createElement('div');
-                typingDiv.classList.add('typing-indicator');
-                typingDiv.id = 'typing-indicator';
-                typingDiv.innerHTML = `
-                    <span>${personalities[currentPersonality].name} is thinking</span>
-                    <div class="typing-dots">
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
-                    </div>
-                `;
-                chatMessages.appendChild(typingDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
+    const typingDiv = document.createElement('div');
+    typingDiv.classList.add('typing-indicator');
+    typingDiv.id = 'typing-indicator';
+    
+    // Check if the last user message contains /image command
+    const isGeneratingImage = conversationHistory.some(msg => 
+        msg.role === "user" && 
+        msg.content.trim().startsWith('/image')
+    );
+    
+    const statusText = isGeneratingImage 
+        ? `${personalities[currentPersonality].name} is generating an image` 
+        : `${personalities[currentPersonality].name} is thinking`;
+    
+    typingDiv.innerHTML = `
+        <span>${statusText}</span>
+        <div class="typing-dots">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+        </div>
+    `;
+    
+    chatMessages.appendChild(typingDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
     
             // Hide typing indicator (unchanged)
             function hideTypingIndicator() {
