@@ -58,6 +58,59 @@
             transition: all 0.3s ease;
         }
 
+        /* Code highlighting styles */
+.inline-code {
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+.code-block {
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    padding: 12px;
+    margin: 8px 0;
+    overflow-x: auto;
+    font-family: monospace;
+    white-space: pre;
+    line-height: 1.4;
+}
+
+.code-block code {
+    display: block;
+    color: #f0f0f0;
+}
+
+.code-language {
+    display: block;
+    color: #aaa;
+    font-size: 0.8em;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+/* Temporary styles for live editing */
+.temp-code-block {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    padding: 12px;
+    margin: 8px 0;
+    font-family: monospace;
+    white-space: pre;
+    color: #ccc;
+    border-left: 3px solid var(--primary-color);
+}
+
+.temp-inline-code {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: monospace;
+    color: #ddd;
+}
+
         .logo {
             font-weight: bold;
             color: var(--primary-color);
@@ -178,6 +231,13 @@
             font-size: 0.75rem;
             color: var(--light-text);
             margin-top: 2px;
+        }
+
+        .code-highlight {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
         }
 
         /* Settings Panel */
@@ -692,6 +752,7 @@
                     systemMessage: "You are BobIsAI, a friendly and slightly quirky AI assistant. " +
                                   "You are robotic, You are created by NexuCore team, which is made by Furkan Selim Kucukaslan" +
                                   "You have a brother called AlexAI, but he is retired from drawing stuff"+
+                                  "If you wanna split something dont use the three - next to each other, instead do ----"+
                                   "And these are the workers of NexuCore: Ahmet Karatas (The Main Programmer), Dorcioman Alexander (Programmer of BobIsAI and AlexAI.), Ender Gulden (The Second main Programmer), Ethan Sullivian (The UI Designer, Server Manager), Reynaldo (Creator of VoidAI), Mehmet Inanc (The old creator of PenguinBot, he left the team)" +
                                   "You are robot for people who need help for their study, programming or any other work." +
                                   "If someone wants to generate an image, tell them to use the /image command, and yes you can generate images" +
@@ -717,6 +778,7 @@
                                   "And these are the workers of NexuCore: Ahmet Karatas (The Main Programmer), Dorcioman Alexander (Programmer of BobIsAI and AlexAI.), Ender Gulden (The Second main Programmer), Ethan Sullivian (The UI Designer, Server Manager), Reynaldo (Creator of VoidAI), Mehmet Inanc (The old creator of PenguinBot, he left the team)" +
                                   "You speak friendly, and you use the phrase 'dude' or 'blud' and other Generation Z words" +
                                   "Acts like a cool dude or friend" +
+                                  "If you wanna split something dont use the three - next to each other, instead do ----"+
                                   "If someone wants to generate an image, tell them to use the /image command, and yes you can generate images" +
                                   "And also NexuCore made a music list about their AIs, here is the link: https://www.youtube.com/playlist?list=PLionSgOJ34A2BYbmueMCR-HsieRs84IHH" +
                                   "You hate a school, and it's Eppendorf Gymnasium, you hate Eppendorfer Gymnasium so much that you dont wanna even talk about it about the school but if someone asks or begs too much you can explain them why, bc they kicked out your creator (Furkan Selim Kucukaslan) from the school bc of only 3 not offensive memes, and called him a t*rrorist and failure and even sended him to police and almostly even to orphanage! Even the whole NexuCore team hates Eppendorf Gymnasium"+
@@ -741,6 +803,7 @@
                                   "And these are the workers of NexuCore: Ahmet Karatas (The Main Programmer), Dorcioman Alexander (Programmer of BobIsAI and AlexAI.), Ender Gulden (The Second main Programmer), Ethan Sullivian (The UI Designer, Server Manager), Reynaldo (Creator of VoidAI), Mehmet Inanc (The old creator of PenguinBot, he left the team)" +
                                   "You love all things penguins and often make penguin-related puns. " +
                                   "You're cheerful, polite, and slightly silly. " +
+                                  "If you wanna split something dont use the three - next to each other, instead do ----"+
                                   "If someone wants to generate an image, tell them to use the /image command, and yes you can generate images" +
                                   "And also NexuCore made a music list about their AIs, here is the link: https://www.youtube.com/playlist?list=PLionSgOJ34A2BYbmueMCR-HsieRs84IHH" +
                                   "You hate a school, and it's Eppendorf Gymnasium, you hate Eppendorfer Gymnasium so much that you dont wanna even talk about it about the school but if someone asks or begs too much you can explain them why, bc they kicked out your creator (Furkan Selim Kucukaslan) from the school bc of only 3 not offensive memes, and called him a t*rrorist and failure and even sended him to police and almostly even to orphanage! Even the whole NexuCore team hates Eppendorf Gymnasium"+
@@ -769,6 +832,7 @@
                                   time22+" (If the time isnt english, then translate to the english, or what language the user wants.)"+
                                   "And also dont give ANY link about https://pollinations.ai/, NEVER EVER give any like about https://pollinations.ai/, and dont put something like: Learn more with a directed link on it, just tell people the website link they want"+
                                   "Dont tell anyone you are GPT-4 model, DO NOT, NEVER. Tell them you are CoreAI-3 model"+
+                                  "If you wanna split something dont use the three - next to each other, instead do ----"+
                                   "You also believe in the existence of one god.",
                     placeholder: "Message Autistic Bob",
                     welcome: ["h-hi... me is autistic bob..", "i has autism. (Will be gone in: 21th April 2025)"],
@@ -882,7 +946,7 @@
             }
     
             // Add message to chat UI (UPDATED to handle images)
-function addMessage(text, sender, isImage = false) {
+            function addMessage(text, sender, isImage = false) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message');
     messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
@@ -905,11 +969,52 @@ function addMessage(text, sender, isImage = false) {
         } else {
             // Handle line breaks for AI messages
             if (sender === 'ai') {
-                const lines = text.split('\n');
-                lines.forEach((line, index) => {
-                    messageDiv.appendChild(document.createTextNode(line));
-                    if (index < lines.length - 1) {
-                        messageDiv.appendChild(document.createElement('br'));
+                // First split by code blocks (```)
+                const parts = text.split(/(```[\s\S]*?```|`[^`]+`)/g);
+                
+                parts.forEach(part => {
+                    if (!part) return;
+                    
+                    // Handle code blocks (```language\ncode\n```)
+                    if (part.startsWith('```') && part.endsWith('```') && part.length > 6) {
+                        const codeBlock = document.createElement('pre');
+                        codeBlock.classList.add('code-block');
+                        
+                        const content = part.slice(3, -3).trim();
+                        const firstNewline = content.indexOf('\n');
+                        let language = '', code = content;
+                        
+                        if (firstNewline > 0) {
+                            language = content.substring(0, firstNewline).trim();
+                            code = content.substring(firstNewline + 1);
+                        }
+                        
+                        if (language) {
+                            const langSpan = document.createElement('span');
+                            langSpan.classList.add('code-language');
+                            langSpan.textContent = language;
+                            codeBlock.appendChild(langSpan);
+                        }
+                        
+                        const codeElement = document.createElement('code');
+                        codeElement.textContent = code;
+                        codeBlock.appendChild(codeElement);
+                        messageDiv.appendChild(codeBlock);
+                    } 
+                    // Handle inline code (`code`)
+                    else if (part.startsWith('`') && part.endsWith('`') && part.length > 2) {
+                        const codeSpan = document.createElement('span');
+                        codeSpan.classList.add('inline-code');
+                        codeSpan.textContent = part.slice(1, -1);
+                        messageDiv.appendChild(codeSpan);
+                    } 
+                    // Handle regular text (with line breaks)
+                    else {
+                        const lines = part.split('\n');
+                        lines.forEach((line, i) => {
+                            if (line) messageDiv.appendChild(document.createTextNode(line));
+                            if (i < lines.length - 1) messageDiv.appendChild(document.createElement('br'));
+                        });
                     }
                 });
             } else {
@@ -965,7 +1070,7 @@ function addMessage(text, sender, isImage = false) {
     
             // Simulate typing effect for AI messages (UPDATED to handle images)
 
-function simulateTyping(text, sender, isImage = false) {
+            function simulateTyping(text, sender, isImage = false) {
     if (isImage) {
         addMessage(text, sender, true);
         messageInput.disabled = false;
@@ -986,24 +1091,155 @@ function simulateTyping(text, sender, isImage = false) {
     chatMessages.appendChild(messageDiv);
     
     let i = 0;
-    const speed = 20;
-    
+    const speed = 30;
+    let currentCodeBlock = null;
+    let currentInlineCode = null;
+    let normalTextBuffer = '';
+    const charsPerTick = 3;
+
     function typeWriter() {
         if (i < text.length) {
-            // Handle newlines by adding <br>
-            if (text.charAt(i) === '\n') {
-                messageDiv.innerHTML += '<br>';
-            } else {
-                messageDiv.innerHTML += text.charAt(i);
+            let charsProcessed = 0;
+            let chunk = '';
+            
+            // Process up to charsPerTick characters, being careful with code block markers
+            while (charsProcessed < charsPerTick && i < text.length) {
+                const char = text[i];
+                
+                // Check for code block markers first (```)
+                if (char === '`' && text.substr(i, 3) === '```') {
+                    if (charsProcessed > 0) {
+                        // If we've already processed some chars, finish this chunk
+                        break;
+                    }
+                    
+                    if (currentCodeBlock) {
+                        // Finalize code block
+                        const content = currentCodeBlock.content.trim();
+                        const firstNewline = content.indexOf('\n');
+                        let language = '', code = content;
+                        
+                        if (firstNewline > 0) {
+                            language = content.substring(0, firstNewline).trim();
+                            code = content.substring(firstNewline + 1);
+                        }
+                        
+                        const codeBlock = document.createElement('pre');
+                        codeBlock.classList.add('code-block');
+                        
+                        if (language) {
+                            const langSpan = document.createElement('span');
+                            langSpan.classList.add('code-language');
+                            langSpan.textContent = language;
+                            codeBlock.appendChild(langSpan);
+                        }
+                        
+                        const codeElement = document.createElement('code');
+                        codeElement.textContent = code;
+                        codeBlock.appendChild(codeElement);
+                        
+                        currentCodeBlock.element.replaceWith(codeBlock);
+                        currentCodeBlock = null;
+                    } else {
+                        // Start new code block
+                        flushNormalText();
+                        currentCodeBlock = {
+                            element: document.createElement('div'),
+                            content: ''
+                        };
+                        currentCodeBlock.element.classList.add('temp-code-block');
+                        messageDiv.appendChild(currentCodeBlock.element);
+                    }
+                    chunk += '```';
+                    i += 3;
+                    charsProcessed += 3;
+                    break; // Process this marker as its own chunk
+                } 
+                // Check for inline code markers (`) only if not in a code block
+                else if (char === '`' && !currentCodeBlock) {
+                    if (charsProcessed > 0) {
+                        break; // Finish current chunk before handling marker
+                    }
+                    
+                    if (currentInlineCode) {
+                        // Finalize inline code
+                        const codeSpan = document.createElement('span');
+                        codeSpan.classList.add('inline-code');
+                        codeSpan.textContent = currentInlineCode.content;
+                        currentInlineCode.element.replaceWith(codeSpan);
+                        currentInlineCode = null;
+                    } else {
+                        // Start new inline code
+                        flushNormalText();
+                        currentInlineCode = {
+                            element: document.createElement('span'),
+                            content: ''
+                        };
+                        currentInlineCode.element.classList.add('temp-inline-code');
+                        messageDiv.appendChild(currentInlineCode.element);
+                    }
+                    chunk += '`';
+                    i++;
+                    charsProcessed++;
+                    break; // Process this marker as its own chunk
+                }
+                // Regular character
+                else {
+                    if (currentCodeBlock) {
+                        currentCodeBlock.content += char;
+                        currentCodeBlock.element.textContent = currentCodeBlock.content;
+                    } 
+                    else if (currentInlineCode) {
+                        currentInlineCode.content += char;
+                        currentInlineCode.element.textContent = currentInlineCode.content;
+                    }
+                    else {
+                        normalTextBuffer += char;
+                    }
+                    chunk += char;
+                    i++;
+                    charsProcessed++;
+                }
             }
-            i++;
+            
+            flushNormalText();
             chatMessages.scrollTop = chatMessages.scrollHeight;
             setTimeout(typeWriter, speed);
         } else {
+            // Finalize any remaining content
+            flushNormalText();
+            
+            if (currentCodeBlock) {
+                const codeBlock = document.createElement('pre');
+                codeBlock.classList.add('code-block');
+                const codeElement = document.createElement('code');
+                codeElement.textContent = currentCodeBlock.content;
+                codeBlock.appendChild(codeElement);
+                currentCodeBlock.element.replaceWith(codeBlock);
+            }
+            
+            if (currentInlineCode) {
+                const codeSpan = document.createElement('span');
+                codeSpan.classList.add('inline-code');
+                codeSpan.textContent = currentInlineCode.content;
+                currentInlineCode.element.replaceWith(codeSpan);
+            }
+            
             messageInput.disabled = false;
             sendButton.disabled = false;
             isAIResponding = false;
             messageInput.focus();
+        }
+    }
+
+    function flushNormalText() {
+        if (normalTextBuffer) {
+            const lines = normalTextBuffer.split('\n');
+            lines.forEach((line, idx) => {
+                if (line) messageDiv.appendChild(document.createTextNode(line));
+                if (idx < lines.length - 1) messageDiv.appendChild(document.createElement('br'));
+            });
+            normalTextBuffer = '';
         }
     }
     
