@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -882,23 +883,33 @@
     
             // Add message to chat UI (UPDATED to handle images)
             function addMessage(text, sender, isImage = false) {
-                const messageDiv = document.createElement('div');
-                messageDiv.classList.add('message');
-                messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
-    
-                if (isImage) {
-                    const img = document.createElement('img');
-                    img.src = text;
-                    img.classList.add('generated-image');  // Add the new class
-                    img.alt = 'Generated image';
-                    messageDiv.appendChild(img);
-                } else {
-                    messageDiv.textContent = text;
-                }
-    
-                chatMessages.appendChild(messageDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message');
+    messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
+
+    if (isImage) {
+        const img = document.createElement('img');
+        img.src = text;
+        img.classList.add('generated-image');
+        img.alt = 'Generated image';
+        messageDiv.appendChild(img);
+    } else {
+        // Make /image bold in user messages
+        if (sender === 'user' && text.startsWith('/image')) {
+            const prompt = text.substring(6).trim();
+            const strong = document.createElement('strong');
+            strong.textContent = '/image';
+            strong.style.fontWeight = 'bold';
+            messageDiv.appendChild(strong);
+            messageDiv.appendChild(document.createTextNode(' ' + prompt));
+        } else {
+            messageDiv.textContent = text;
+        }
+    }
+
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
     
             // Show typing indicator (unchanged)
             function showTypingIndicator() {
