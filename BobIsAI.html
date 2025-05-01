@@ -882,7 +882,7 @@
             }
     
             // Add message to chat UI (UPDATED to handle images)
-            function addMessage(text, sender, isImage = false) {
+function addMessage(text, sender, isImage = false) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message');
     messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
@@ -903,7 +903,18 @@
             messageDiv.appendChild(strong);
             messageDiv.appendChild(document.createTextNode(' ' + prompt));
         } else {
-            messageDiv.textContent = text;
+            // Handle line breaks for AI messages
+            if (sender === 'ai') {
+                const lines = text.split('\n');
+                lines.forEach((line, index) => {
+                    messageDiv.appendChild(document.createTextNode(line));
+                    if (index < lines.length - 1) {
+                        messageDiv.appendChild(document.createElement('br'));
+                    }
+                });
+            } else {
+                messageDiv.textContent = text;
+            }
         }
     }
 
@@ -953,45 +964,51 @@
             }
     
             // Simulate typing effect for AI messages (UPDATED to handle images)
-            function simulateTyping(text, sender, isImage = false) {
-                if (isImage) {
-                    addMessage(text, sender, true);
-                    messageInput.disabled = false;
-                    sendButton.disabled = false;
-                    isAIResponding = false;
-                    messageInput.focus();
-                    return;
-                }
-                
-                messageInput.disabled = true;
-                sendButton.disabled = true;
-                isAIResponding = true;
-                hideTypingIndicator();
-                
-                const messageDiv = document.createElement('div');
-                messageDiv.classList.add('message');
-                messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
-                chatMessages.appendChild(messageDiv);
-                
-                let i = 0;
-                const speed = 20;
-                
-                function typeWriter() {
-                    if (i < text.length) {
-                        messageDiv.textContent += text.charAt(i);
-                        i++;
-                        chatMessages.scrollTop = chatMessages.scrollHeight;
-                        setTimeout(typeWriter, speed);
-                    } else {
-                        messageInput.disabled = false;
-                        sendButton.disabled = false;
-                        isAIResponding = false;
-                        messageInput.focus();
-                    }
-                }
-                
-                typeWriter();
+
+function simulateTyping(text, sender, isImage = false) {
+    if (isImage) {
+        addMessage(text, sender, true);
+        messageInput.disabled = false;
+        sendButton.disabled = false;
+        isAIResponding = false;
+        messageInput.focus();
+        return;
+    }
+    
+    messageInput.disabled = true;
+    sendButton.disabled = true;
+    isAIResponding = true;
+    hideTypingIndicator();
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message');
+    messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
+    chatMessages.appendChild(messageDiv);
+    
+    let i = 0;
+    const speed = 20;
+    
+    function typeWriter() {
+        if (i < text.length) {
+            // Handle newlines by adding <br>
+            if (text.charAt(i) === '\n') {
+                messageDiv.innerHTML += '<br>';
+            } else {
+                messageDiv.innerHTML += text.charAt(i);
             }
+            i++;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            setTimeout(typeWriter, speed);
+        } else {
+            messageInput.disabled = false;
+            sendButton.disabled = false;
+            isAIResponding = false;
+            messageInput.focus();
+        }
+    }
+    
+    typeWriter();
+}
     
             // Load previous conversation from localStorage (UPDATED to handle images)
             function loadConversation() {
