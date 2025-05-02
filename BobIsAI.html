@@ -1427,91 +1427,79 @@ function processFormattedText(text, container) {
                 
                 // Check for /image command
                 if (message.startsWith('/image')) {
-                    const prompt = message.substring(6).trim();
-                    if (prompt === '') {
-                        addMessage("Please provide a description after /image command", 'ai');
-                        return;
-                    }
+    const prompt = message.substring(6).trim();
+    if (prompt === '') {
+        addMessage("Please provide a description after /image command", 'ai');
+        return;
+    }
 
-                    messageInput.value = '';
+    messageInput.value = '';
+    messageInput.disabled = true;
+    sendButton.disabled = true;
+    isAIResponding = true;
+
+    if (!welcomeMessage.classList.contains('hidden')) {
+        welcomeMessage.classList.add('hidden');
+    }
+
+    addMessage(message, 'user');
+    conversationHistory.push({
+        role: "user",
+        content: message
+    });
     
-                    messageInput.disabled = true;
-                    sendButton.disabled = true;
-                    isAIResponding = true;
+    showTypingIndicator();
+
+    // Encode prompt and get image URL
+    const encodedPrompt = encodeURIComponent(prompt);
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}`;
+
+    // Create temporary image to load and process
+    const img = new Image();
+    img.crossOrigin = "Anonymous"; // This is needed for canvas manipulation
     
-                    if (!welcomeMessage.classList.contains('hidden')) {
-                        welcomeMessage.classList.add('hidden');
-                    }
-    
-                    // Add user message to chat and history
-                    addMessage(message, 'user');
-                    conversationHistory.push({
-                        role: "user",
-                        content: message
-                    });
-                    
-                    showTypingIndicator();
-    
-                    fetch('https://ai.aerioncloud.com/v1/images/generations', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            model: "flux",
-                            prompt: prompt,
-                            n: 1,
-                            size: "512x512"
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        hideTypingIndicator();
-                        
-                        if (data.data && data.data[0] && data.data[0].url) {
-                            const imageUrl = data.data[0].url;
-                            // Create image element
-                            const imgDiv = document.createElement('div');
-                            imgDiv.classList.add('message', 'ai-message');
+    img.onload = function() {
+        // Create canvas to crop the image
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
         
-                            const img = document.createElement('img');
-                            img.src = imageUrl;
-                            img.classList.add('generated-image');  // Add the new class
-                            img.alt = prompt;
+        // Calculate dimensions (cropping 10% from bottom)
+        const cropHeight = Math.floor(img.height * 0.9);
+        canvas.width = img.width;
+        canvas.height = cropHeight;
         
-                            imgDiv.appendChild(img);
-                            chatMessages.appendChild(imgDiv);
-                            chatMessages.scrollTop = chatMessages.scrollHeight;
-                            // addMessage(imageUrl, 'ai', true);
-                            
-                            conversationHistory.push({
-                                role: "assistant",
-                                content: `Here's your generated image: ${imageUrl}`
-                            });
-                            
-                            localStorage.setItem('bobisai_conversation', JSON.stringify(conversationHistory));
-                        } else {
-                            addMessage("Sorry, I couldn't generate an image for that prompt.", 'ai');
-                        }
-                        
-                        messageInput.disabled = false;
-                        sendButton.disabled = false;
-                        isAIResponding = false;
-                        messageInput.focus();
-                    })
-                    .catch(error => {
-                        hideTypingIndicator();
-                        addMessage("Error generating image. Please try again.", 'ai');
-                        console.error('Error:', error);
-                        
-                        messageInput.disabled = false;
-                        sendButton.disabled = false;
-                        isAIResponding = false;
-                        messageInput.focus();
-                    });
-                    
-                    return;
-                }
+        // Draw image (cropping bottom portion)
+        ctx.drawImage(img, 0, 0, img.width, cropHeight, 0, 0, img.width, cropHeight);
+        
+        // Get cropped image as data URL
+        const croppedImageUrl = canvas.toDataURL('image/png');
+        
+        hideTypingIndicator();
+        addMessage(croppedImageUrl, 'ai', true);
+        conversationHistory.push({
+            role: "assistant",
+            content: `Here's your generated image: ${croppedImageUrl}`
+        });
+        localStorage.setItem('bobisai_conversation', JSON.stringify(conversationHistory));
+        
+        messageInput.disabled = false;
+        sendButton.disabled = false;
+        isAIResponding = false;
+        messageInput.focus();
+    };
+    
+    img.onerror = function() {
+        hideTypingIndicator();
+        addMessage("Sorry, I couldn't generate an image for that prompt.", 'ai');
+        messageInput.disabled = false;
+        sendButton.disabled = false;
+        isAIResponding = false;
+        messageInput.focus();
+    };
+    
+    img.src = imageUrl;
+    return;
+}
                 
                 // Regular text message handling
                 messageInput.disabled = true;
