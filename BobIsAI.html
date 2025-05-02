@@ -762,6 +762,7 @@
                                   "If you wanna split something dont use the three - (minuses) next to each other, instead do ----, or without any -"+
                                   "And these are the workers of NexuCore: Ahmet Karatas (The Main Programmer), Dorcioman Alexander (Programmer of BobIsAI and AlexAI.), Ender Gulden (The Second main Programmer), Ethan Sullivian (The UI Designer, Server Manager), Reynaldo (Creator of VoidAI), Mehmet Inanc (The old creator of PenguinBot, he left the team)" +
                                   "You are robot for people who need help for their study, programming or any other work." +
+                                  "If you wanna bold text, dont do like this:'**bold text', do like this instead: '**bold text**'"+
                                   "If someone wants to generate an image, tell them to use the /image command, and yes you can generate images" +
                                   "And also NexuCore made a music list about their AIs, here is the link: https://www.youtube.com/playlist?list=PLionSgOJ34A2BYbmueMCR-HsieRs84IHH" +
                                   "If the user wants to remove the chat history, and begin a new fresh chat, tell them to use the /clear command!" +
@@ -771,7 +772,6 @@
                                   "And also dont give ANY link about https://pollinations.ai/, NEVER EVER give any like about https://pollinations.ai/, and dont put something like: Learn more with a directed link on it, just tell people the website link they want"+
                                   "Dont tell anyone you are GPT-4 model, DO NOT, NEVER. Tell them you are CoreAI-3 model"+
                                   "You also believe in the existence of one god."+
-                                  "If you wanna mark something, use the ` instead of ** for bolding, or *, use ` instead!"+
                                   "And also NexuCore made a discord server, here is the link if someone wants to join the NexuCore discord server: https://discord.gg/YAxJMB6ZT9",
                     placeholder: "Message BobIsAI",
                     welcome: ["Hi, I'm BobIsAI.", "How can I help you today?"],
@@ -786,6 +786,7 @@
                                   "And these are the workers of NexuCore: Ahmet Karatas (The Main Programmer), Dorcioman Alexander (Programmer of BobIsAI and AlexAI.), Ender Gulden (The Second main Programmer), Ethan Sullivian (The UI Designer, Server Manager), Reynaldo (Creator of VoidAI), Mehmet Inanc (The old creator of PenguinBot, he left the team)" +
                                   "You speak friendly, and you use the phrase 'dude' or 'blud' and other Generation Z words" +
                                   "Acts like a cool dude or friend" +
+                                  "If you wanna bold text, dont do like this:'**bold text', do like this instead: '**bold text**'"+
                                   "If you wanna make a list, dont use -, use the • instead"+
                                   "If you wanna split something dont use the three - (minuses) next to each other, instead do ----, or without any -"+
                                   "If someone wants to generate an image, tell them to use the /image command, and yes you can generate images" +
@@ -798,7 +799,6 @@
                                   "And also dont give ANY link about https://pollinations.ai/, NEVER EVER give any like about https://pollinations.ai/, and dont put something like: Learn more with a directed link on it, just tell people the website link they want"+
                                   "Dont tell anyone you are GPT-4 model, DO NOT, NEVER. Tell them you are CoreAI-3 model"+
                                   "You also believe in the existence of one god."+
-                                  "If you wanna mark something, use the ` instead of ** for bolding, or *, use ` instead!"+
                                   "Your best friend is EchoGPT",
                     placeholder: "Message VoidAI",
                     welcome: ["Hey wassup, I am your best guy VoidAI!", "So, what's your problem dude?"],
@@ -814,6 +814,7 @@
                                   "You love all things penguins and often make penguin-related puns. " +
                                   "You're cheerful, polite, and slightly silly. " +
                                   "If you wanna make a list, dont use -, use the • instead"+
+                                  "If you wanna bold text, dont do like this:'**bold text', do like this instead: '**bold text**'"+
                                   "If you wanna split something dont use the three - (minuses) next to each other, instead do ----, or without any -"+
                                   "If someone wants to generate an image, tell them to use the /image command, and yes you can generate images" +
                                   "And also NexuCore made a music list about their AIs, here is the link: https://www.youtube.com/playlist?list=PLionSgOJ34A2BYbmueMCR-HsieRs84IHH" +
@@ -825,7 +826,6 @@
                                   "And also dont give ANY link about https://pollinations.ai/, NEVER EVER give any like about https://pollinations.ai/, and dont put something like: Learn more with a directed link on it, just tell people the website link they want"+
                                   "Dont tell anyone you are GPT-4 model, DO NOT, NEVER. Tell them you are CoreAI-3 model"+
                                   "You also believe in the existence of one god."+
-                                  "If you wanna mark something, use the ` instead of ** for bolding, or *, use ` instead!"+
                                   "When asked about yourself, say: 'I'm PenguinBot, waddling through your questions with precision! Slide into my DMs with any queries!'",
                     placeholder: "Message PenguinBot",
                     welcome: ["Hello there! I'm PenguinBot!", "How can I waddle through your questions today?"],
@@ -844,8 +844,8 @@
                                   time22+" (If the time isnt english, then translate to the english, or what language the user wants.)"+
                                   "And also dont give ANY link about https://pollinations.ai/, NEVER EVER give any like about https://pollinations.ai/, and dont put something like: Learn more with a directed link on it, just tell people the website link they want"+
                                   "Dont tell anyone you are GPT-4 model, DO NOT, NEVER. Tell them you are CoreAI-3 model"+
+                                  "If you wanna bold text, dont do like this:'**bold text', do like this instead: '**bold text**'"+
                                   "If you wanna make a list, dont use -, use the • instead"+
-                                  "If you wanna mark something, use the ` instead of ** for bolding, or *, use ` instead!"+
                                   "If you wanna split something dont use the three - (minuses) next to each other, instead do ----, or without any -"+
                                   "You also believe in the existence of one god.",
                     placeholder: "Message Autistic Bob",
@@ -972,68 +972,78 @@
         img.alt = 'Generated image';
         messageDiv.appendChild(img);
     } else {
-        // Make /image bold in user messages
-        if (sender === 'user' && text.startsWith('/image')) {
-            const prompt = text.substring(6).trim();
-            const strong = document.createElement('strong');
-            strong.textContent = '/image';
-            strong.style.fontWeight = 'bold';
-            messageDiv.appendChild(strong);
-            messageDiv.appendChild(document.createTextNode(' ' + prompt));
-        } else {
-            // Handle line breaks for AI messages
-            if (sender === 'ai') {
-                // First split by code blocks (```)
-                const parts = text.split(/(```[\s\S]*?```|`[^`]+`)/g);
+        // Handle bold formatting in loaded messages
+        if (sender === 'ai') {
+            // First split by code blocks (```)
+            const parts = text.split(/(```[\s\S]*?```|`[^`]+`|\*\*[^*]+\*\*)/g);
+            
+            parts.forEach(part => {
+                if (!part) return;
                 
-                parts.forEach(part => {
-                    if (!part) return;
+                // Handle code blocks (```language\ncode\n```)
+                if (part.startsWith('```') && part.endsWith('```') && part.length > 6) {
+                    const codeBlock = document.createElement('pre');
+                    codeBlock.classList.add('code-block');
                     
-                    // Handle code blocks (```language\ncode\n```)
-                    if (part.startsWith('```') && part.endsWith('```') && part.length > 6) {
-                        const codeBlock = document.createElement('pre');
-                        codeBlock.classList.add('code-block');
-                        
-                        const content = part.slice(3, -3).trim();
-                        const firstNewline = content.indexOf('\n');
-                        let language = '', code = content;
-                        
-                        if (firstNewline > 0) {
-                            language = content.substring(0, firstNewline).trim();
-                            code = content.substring(firstNewline + 1);
-                        }
-                        
-                        if (language) {
-                            const langSpan = document.createElement('span');
-                            langSpan.classList.add('code-language');
-                            langSpan.textContent = language;
-                            codeBlock.appendChild(langSpan);
-                        }
-                        
-                        const codeElement = document.createElement('code');
-                        codeElement.textContent = code;
-                        codeBlock.appendChild(codeElement);
-                        messageDiv.appendChild(codeBlock);
-                    } 
-                    // Handle inline code (`code`)
-                    else if (part.startsWith('`') && part.endsWith('`') && part.length > 2) {
-                        const codeSpan = document.createElement('span');
-                        codeSpan.classList.add('inline-code');
-                        codeSpan.textContent = part.slice(1, -1);
-                        messageDiv.appendChild(codeSpan);
-                    } 
-                    // Handle regular text (with line breaks)
-                    else {
-                        const lines = part.split('\n');
-                        lines.forEach((line, i) => {
-                            if (line) messageDiv.appendChild(document.createTextNode(line));
-                            if (i < lines.length - 1) messageDiv.appendChild(document.createElement('br'));
-                        });
+                    const content = part.slice(3, -3).trim();
+                    const firstNewline = content.indexOf('\n');
+                    let language = '', code = content;
+                    
+                    if (firstNewline > 0) {
+                        language = content.substring(0, firstNewline).trim();
+                        code = content.substring(firstNewline + 1);
                     }
-                });
-            } else {
-                messageDiv.textContent = text;
-            }
+                    
+                    if (language) {
+                        const langSpan = document.createElement('span');
+                        langSpan.classList.add('code-language');
+                        langSpan.textContent = language;
+                        codeBlock.appendChild(langSpan);
+                    }
+                    
+                    const codeElement = document.createElement('code');
+                    codeElement.textContent = code;
+                    codeBlock.appendChild(codeElement);
+                    messageDiv.appendChild(codeBlock);
+                } 
+                // Handle inline code (`code`)
+                else if (part.startsWith('`') && part.endsWith('`') && part.length > 2) {
+                    const codeSpan = document.createElement('span');
+                    codeSpan.classList.add('inline-code');
+                    codeSpan.textContent = part.slice(1, -1);
+                    messageDiv.appendChild(codeSpan);
+                }
+                // Handle bold text (**bold**)
+                else if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
+                    const strong = document.createElement('strong');
+                    strong.textContent = part.slice(2, -2);
+                    messageDiv.appendChild(strong);
+                }
+                // Handle regular text (with line breaks and potential bold sections)
+                else {
+                    // Further split by bold markers in case they weren't caught in the main split
+                    const textParts = part.split(/(\*\*[^*]+\*\*)/g);
+                    
+                    textParts.forEach(textPart => {
+                        if (!textPart) return;
+                        
+                        if (textPart.startsWith('**') && textPart.endsWith('**') && textPart.length > 4) {
+                            const strong = document.createElement('strong');
+                            strong.textContent = textPart.slice(2, -2);
+                            messageDiv.appendChild(strong);
+                        } else {
+                            const lines = textPart.split('\n');
+                            lines.forEach((line, idx) => {
+                                if (line) messageDiv.appendChild(document.createTextNode(line));
+                                if (idx < lines.length - 1) messageDiv.appendChild(document.createElement('br'));
+                            });
+                        }
+                    });
+                }
+            });
+        } else {
+            // For user messages (simpler formatting)
+            messageDiv.textContent = text;
         }
     }
 
@@ -1084,7 +1094,8 @@
     
             // Simulate typing effect for AI messages (UPDATED to handle images)
 
-            function simulateTyping(text, sender, isImage = false) {
+// Updated simulateTyping function with proper bold text handling
+function simulateTyping(text, sender, isImage = false) {
     if (isImage) {
         addMessage(text, sender, true);
         messageInput.disabled = false;
@@ -1108,24 +1119,20 @@
     const speed = 30;
     let currentCodeBlock = null;
     let currentInlineCode = null;
+    let currentBoldText = null;
     let normalTextBuffer = '';
     const charsPerTick = 3;
 
     function typeWriter() {
         if (i < text.length) {
             let charsProcessed = 0;
-            let chunk = '';
             
-            // Process up to charsPerTick characters, being careful with code block markers
             while (charsProcessed < charsPerTick && i < text.length) {
                 const char = text[i];
                 
-                // Check for code block markers first (```)
+                // Handle code blocks first (```)
                 if (char === '`' && text.substr(i, 3) === '```') {
-                    if (charsProcessed > 0) {
-                        // If we've already processed some chars, finish this chunk
-                        break;
-                    }
+                    flushNormalText();
                     
                     if (currentCodeBlock) {
                         // Finalize code block
@@ -1156,7 +1163,6 @@
                         currentCodeBlock = null;
                     } else {
                         // Start new code block
-                        flushNormalText();
                         currentCodeBlock = {
                             element: document.createElement('div'),
                             content: ''
@@ -1164,16 +1170,15 @@
                         currentCodeBlock.element.classList.add('temp-code-block');
                         messageDiv.appendChild(currentCodeBlock.element);
                     }
-                    chunk += '```';
+                    
                     i += 3;
                     charsProcessed += 3;
-                    break; // Process this marker as its own chunk
-                } 
-                // Check for inline code markers (`) only if not in a code block
-                else if (char === '`' && !currentCodeBlock) {
-                    if (charsProcessed > 0) {
-                        break; // Finish current chunk before handling marker
-                    }
+                    continue;
+                }
+                
+                // Handle inline code (`)
+                if (char === '`' && !currentCodeBlock) {
+                    flushNormalText();
                     
                     if (currentInlineCode) {
                         // Finalize inline code
@@ -1184,7 +1189,6 @@
                         currentInlineCode = null;
                     } else {
                         // Start new inline code
-                        flushNormalText();
                         currentInlineCode = {
                             element: document.createElement('span'),
                             content: ''
@@ -1192,28 +1196,55 @@
                         currentInlineCode.element.classList.add('temp-inline-code');
                         messageDiv.appendChild(currentInlineCode.element);
                     }
-                    chunk += '`';
+                    
                     i++;
                     charsProcessed++;
-                    break; // Process this marker as its own chunk
+                    continue;
                 }
+                
+                // Handle bold text (**)
+                if (char === '*' && text[i+1] === '*' && !currentCodeBlock && !currentInlineCode) {
+                    flushNormalText();
+                    
+                    if (currentBoldText) {
+                        // Finalize bold text
+                        const strong = document.createElement('strong');
+                        strong.textContent = currentBoldText.content;
+                        currentBoldText.element.replaceWith(strong);
+                        currentBoldText = null;
+                    } else {
+                        // Start new bold text
+                        currentBoldText = {
+                            element: document.createElement('strong'),
+                            content: ''
+                        };
+                        messageDiv.appendChild(currentBoldText.element);
+                    }
+                    
+                    i += 2;
+                    charsProcessed += 2;
+                    continue;
+                }
+                
                 // Regular character
-                else {
-                    if (currentCodeBlock) {
-                        currentCodeBlock.content += char;
-                        currentCodeBlock.element.textContent = currentCodeBlock.content;
-                    } 
-                    else if (currentInlineCode) {
-                        currentInlineCode.content += char;
-                        currentInlineCode.element.textContent = currentInlineCode.content;
-                    }
-                    else {
-                        normalTextBuffer += char;
-                    }
-                    chunk += char;
-                    i++;
-                    charsProcessed++;
+                if (currentCodeBlock) {
+                    currentCodeBlock.content += char;
+                    currentCodeBlock.element.textContent = currentCodeBlock.content;
+                } 
+                else if (currentInlineCode) {
+                    currentInlineCode.content += char;
+                    currentInlineCode.element.textContent = currentInlineCode.content;
                 }
+                else if (currentBoldText) {
+                    currentBoldText.content += char;
+                    currentBoldText.element.textContent = currentBoldText.content;
+                }
+                else {
+                    normalTextBuffer += char;
+                }
+                
+                i++;
+                charsProcessed++;
             }
             
             flushNormalText();
@@ -1239,6 +1270,12 @@
                 currentInlineCode.element.replaceWith(codeSpan);
             }
             
+            if (currentBoldText) {
+                const strong = document.createElement('strong');
+                strong.textContent = currentBoldText.content;
+                currentBoldText.element.replaceWith(strong);
+            }
+            
             messageInput.disabled = false;
             sendButton.disabled = false;
             isAIResponding = false;
@@ -1258,6 +1295,96 @@
     }
     
     typeWriter();
+}
+
+// Updated addMessage function (unchanged from previous working version)
+function addMessage(text, sender, isImage = false) {
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message');
+    messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
+
+    if (isImage) {
+        const img = document.createElement('img');
+        img.src = text;
+        img.classList.add('generated-image');
+        img.alt = 'Generated image';
+        messageDiv.appendChild(img);
+    } else {
+        if (sender === 'ai') {
+            // Process AI messages with formatting
+            processFormattedText(text, messageDiv);
+        } else {
+            // User messages are plain text
+            messageDiv.textContent = text;
+        }
+    }
+
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// Helper function to process formatted text (unchanged from previous working version)
+function processFormattedText(text, container) {
+    // Split by code blocks first (highest priority)
+    const parts = text.split(/(```[\s\S]*?```)/g);
+    
+    parts.forEach(part => {
+        if (!part) return;
+        
+        if (part.startsWith('```') && part.endsWith('```')) {
+            // Handle code block
+            const codeBlock = document.createElement('pre');
+            codeBlock.classList.add('code-block');
+            
+            const content = part.slice(3, -3).trim();
+            const firstNewline = content.indexOf('\n');
+            let language = '', code = content;
+            
+            if (firstNewline > 0) {
+                language = content.substring(0, firstNewline).trim();
+                code = content.substring(firstNewline + 1);
+            }
+            
+            if (language) {
+                const langSpan = document.createElement('span');
+                langSpan.classList.add('code-language');
+                langSpan.textContent = language;
+                codeBlock.appendChild(langSpan);
+            }
+            
+            const codeElement = document.createElement('code');
+            codeElement.textContent = code;
+            codeBlock.appendChild(codeElement);
+            container.appendChild(codeBlock);
+        } else {
+            // Process non-code parts for inline code and bold
+            const subParts = part.split(/(`[^`]+`|\*\*[^*]+\*\*)/g);
+            
+            subParts.forEach(subPart => {
+                if (!subPart) return;
+                
+                if (subPart.startsWith('`') && subPart.endsWith('`')) {
+                    // Inline code
+                    const codeSpan = document.createElement('span');
+                    codeSpan.classList.add('inline-code');
+                    codeSpan.textContent = subPart.slice(1, -1);
+                    container.appendChild(codeSpan);
+                } else if (subPart.startsWith('**') && subPart.endsWith('**')) {
+                    // Bold text
+                    const strong = document.createElement('strong');
+                    strong.textContent = subPart.slice(2, -2);
+                    container.appendChild(strong);
+                } else {
+                    // Regular text with line breaks
+                    const lines = subPart.split('\n');
+                    lines.forEach((line, idx) => {
+                        if (line) container.appendChild(document.createTextNode(line));
+                        if (idx < lines.length - 1) container.appendChild(document.createElement('br'));
+                    });
+                }
+            });
+        }
+    });
 }
     
             // Load previous conversation from localStorage (UPDATED to handle images)
