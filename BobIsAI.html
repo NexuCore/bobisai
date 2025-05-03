@@ -709,14 +709,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-            const originalFetch = window.fetch;
-window.fetch = function(resource, options = {}) {
-  if ((options.method === undefined || options.method.toUpperCase() === 'GET')) {
-    return Promise.reject(new Error('GET requests are blocked by script'));
-  }
-  return originalFetch(resource, options);
-};
-
             const now = new Date();
 
             // Get individual components
