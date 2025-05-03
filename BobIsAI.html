@@ -1427,91 +1427,124 @@ function processFormattedText(text, container) {
                 
                 // Check for /image command
                 if (message.startsWith('/image')) {
-                    const prompt = message.substring(6).trim();
-                    if (prompt === '') {
-                        addMessage("Please provide a description after /image command", 'ai');
-                        return;
-                    }
+        const prompt = message.substring(6).trim();
+        if (prompt === '') {
+            addMessage("Please provide a description after /image command", 'ai');
+            return;
+        }
 
-                    messageInput.value = '';
-    
-                    messageInput.disabled = true;
-                    sendButton.disabled = true;
-                    isAIResponding = true;
-    
-                    if (!welcomeMessage.classList.contains('hidden')) {
-                        welcomeMessage.classList.add('hidden');
-                    }
-    
-                    // Add user message to chat and history
-                    addMessage(message, 'user');
+        messageInput.value = '';
+        messageInput.disabled = true;
+        sendButton.disabled = true;
+        isAIResponding = true;
+
+        if (!welcomeMessage.classList.contains('hidden')) {
+            welcomeMessage.classList.add('hidden');
+        }
+
+        addMessage(message, 'user');
+        conversationHistory.push({
+            role: "user",
+            content: message
+        });
+        
+        showTypingIndicator();
+
+        // First try ai.aerioncloud.com/v1/images/generations
+        fetch('https://ai.aerioncloud.com/v1/images/generations', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                model: "flux",
+                prompt: prompt,
+                n: 1,
+                size: "512x512"
+            })
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to generate image');
+            return response.json();
+        })
+        .then(data => {
+            if (data.data && data.data[0] && data.data[0].url) {
+                // For aerioncloud, show image directly without cropping
+                const img = new Image();
+                img.onload = function() {
+                    hideTypingIndicator();
+                    addMessage(data.data[0].url, 'ai', true);
                     conversationHistory.push({
-                        role: "user",
-                        content: message
+                        role: "assistant",
+                        content: `Here's your generated image: ${data.data[0].url}`
                     });
+                    localStorage.setItem('bobisai_conversation', JSON.stringify(conversationHistory));
                     
-                    showTypingIndicator();
-    
-                    fetch('https://ai.aerioncloud.com/v1/images/generations', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            model: "flux",
-                            prompt: prompt,
-                            n: 1,
-                            size: "512x512"
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        hideTypingIndicator();
-                        
-                        if (data.data && data.data[0] && data.data[0].url) {
-                            const imageUrl = data.data[0].url;
-                            // Create image element
-                            const imgDiv = document.createElement('div');
-                            imgDiv.classList.add('message', 'ai-message');
+                    messageInput.disabled = false;
+                    sendButton.disabled = false;
+                    isAIResponding = false;
+                    messageInput.focus();
+                };
+                img.onerror = function() {
+                    throw new Error('Failed to load aerioncloud image');
+                };
+                img.src = data.data[0].url;
+            } else {
+                throw new Error('Invalid response from aerioncloud');
+            }
+        })
+        .catch(error => {
+            console.log("ai.aerioncloud.com failed, falling back to pollinations.ai", error);
+            // Fallback to pollinations.ai
+            const encodedPrompt = encodeURIComponent(prompt);
+            const pollinationsImage = new Image();
+            pollinationsImage.crossOrigin = "Anonymous";
+            
+            pollinationsImage.onload = function() {
+                // Only crop for pollinations.ai images
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Calculate dimensions (cropping 10% from bottom)
+                const cropHeight = Math.floor(pollinationsImage.height * 0.9);
+                canvas.width = pollinationsImage.width;
+                canvas.height = cropHeight;
+                
+                // Draw image (cropping bottom portion)
+                ctx.drawImage(pollinationsImage, 0, 0, pollinationsImage.width, cropHeight, 
+                             0, 0, pollinationsImage.width, cropHeight);
+                
+                // Get cropped image as data URL
+                const croppedImageUrl = canvas.toDataURL('image/png');
+                
+                hideTypingIndicator();
+                addMessage(croppedImageUrl, 'ai', true);
+                conversationHistory.push({
+                    role: "assistant",
+                    content: `Here's your generated image: ${croppedImageUrl}`
+                });
+                localStorage.setItem('bobisai_conversation', JSON.stringify(conversationHistory));
+                
+                messageInput.disabled = false;
+                sendButton.disabled = false;
+                isAIResponding = false;
+                messageInput.focus();
+            };
+            
+            pollinationsImage.onerror = function() {
+                hideTypingIndicator();
+                addMessage("Sorry, I couldn't generate an image for that prompt.", 'ai');
+                messageInput.disabled = false;
+                sendButton.disabled = false;
+                isAIResponding = false;
+                messageInput.focus();
+            };
+            
+            pollinationsImage.src = `https://image.pollinations.ai/prompt/${encodedPrompt}`;
+        });
         
-                            const img = document.createElement('img');
-                            img.src = imageUrl;
-                            img.classList.add('generated-image');  // Add the new class
-                            img.alt = prompt;
-        
-                            imgDiv.appendChild(img);
-                            chatMessages.appendChild(imgDiv);
-                            chatMessages.scrollTop = chatMessages.scrollHeight;
-                            // addMessage(imageUrl, 'ai', true);
-                            
-                            conversationHistory.push({
-                                role: "assistant",
-                                content: `Here's your generated image: ${imageUrl}`
-                            });
-                            
-                            localStorage.setItem('bobisai_conversation', JSON.stringify(conversationHistory));
-                        } else {
-                            addMessage("Sorry, I couldn't generate an image for that prompt.", 'ai');
-                        }
-                        
-                        messageInput.disabled = false;
-                        sendButton.disabled = false;
-                        isAIResponding = false;
-                        messageInput.focus();
-                    })
-                    .catch(error => {
-                        hideTypingIndicator();
-                        addMessage("Error generating image. Please try again.", 'ai');
-                        console.error('Error:', error);
-                        
-                        messageInput.disabled = false;
-                        sendButton.disabled = false;
-                        isAIResponding = false;
-                        messageInput.focus();
-                    });
-                    
-                    return;
-                }
+        return;
+    }
                 
                 // Regular text message handling
                 messageInput.disabled = true;
