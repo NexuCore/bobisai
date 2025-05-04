@@ -896,7 +896,7 @@
             const banCountdown = document.getElementById('ban-countdown');
             
             function containsWarning(response) {
-                    return response.startsWith('!warnuser')
+                    return response.includes('!warnuser') 
                 }
 
             // Check if user is banned
