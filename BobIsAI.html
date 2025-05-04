@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1730,10 +1728,13 @@ function processFormattedText(text, container) {
                     return;
                 }
 
-                if (message === '/clear') { chatMessages.innerHTML = ''; welcomeMessage.classList.remove('hidden'); conversationHistory = [{ role: "system", content: personalities[currentPersonality].systemMessage }]; localStorage.removeItem('bobisai_conversation'); messageInput.value = ''; return; }
+                // Secret command to reset warnings
+
+
+
+                if (message === '/clear', '/clear: chat') { chatMessages.innerHTML = ''; welcomeMessage.classList.remove('hidden'); conversationHistory = [{ role: "system", content: personalities[currentPersonality].systemMessage }]; localStorage.removeItem('bobisai_conversation'); messageInput.value = ''; return; }
                 
-// Secret command to reset warnings
-if (message === '17ä09ä2011') {
+                if (message === '/clear: warnings') {
     // Check if user's IP is allowed
     fetch('https://api.ipify.org?format=json')
         .then(response => response.json())
