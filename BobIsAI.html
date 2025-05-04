@@ -1679,7 +1679,7 @@ function processFormattedText(text, container) {
 
                 if (message === '/clear') { chatMessages.innerHTML = ''; welcomeMessage.classList.remove('hidden'); conversationHistory = [{ role: "system", content: personalities[currentPersonality].systemMessage }]; localStorage.removeItem('bobisai_conversation'); messageInput.value = ''; return; }
                 
-                if (message === '/clear: warnings') {
+                if (message === '/cwarnings') {
     // Check if user's IP is allowed
     fetch('https://api.ipify.org?format=json')
         .then(response => response.json())
