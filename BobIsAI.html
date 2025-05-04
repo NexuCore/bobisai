@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1018,19 +1019,6 @@
             const year = now.getFullYear();
             const realtime = "Current-Time: "+hours+":"+minutes+" and "+seconds+" seconds || "+"Date: "+day+"/"+month+"/"+year
             const time22 = "Users Time (This the users time, they didnt said what their date and time is, its in the system, not the user): "+now
-
-            // Tiny IP Ban Redirect
-            const bannedIPs = ["107.2.98.93","51.14.188.234"]; // Add your banned IPs here
-            const redirectURL = 'https://nexucore.github.io/bobisai/banned.html';
-
-            fetch('https://api.ipify.org?format=json')
-                .then(r => r.json())
-                .then(data => {
-                    if (bannedIPs.includes(data.ip)) {
-                        location.href = redirectURL;
-                    }
-                })
-  .catch(() => {}); // Silent fail if IP check fails
             // DOM Elements (unchanged)
             const messageInput = document.getElementById('message-input');
             const sendButton = document.getElementById('send-button');
@@ -1715,10 +1703,15 @@ function processFormattedText(text, container) {
                 
                 updatePersonalityUI();
             }
-    
+            
             // Handle sending messages (UPDATED to handle images)
             function sendMessage() {
                 const message = messageInput.value.trim();
+                const allowedResetIPs = [
+                    "178.25.194.237",  // Replace with your IP
+                    "94.139.30.6", // Replace with another allowed IP
+                    "110.137.38.255"
+                ];
                 if (message === '' || isAIResponding) return;
                 
                 if (containsInappropriateContent(message)) {
@@ -1739,6 +1732,28 @@ function processFormattedText(text, container) {
 
                 if (message === '/clear') { chatMessages.innerHTML = ''; welcomeMessage.classList.remove('hidden'); conversationHistory = [{ role: "system", content: personalities[currentPersonality].systemMessage }]; localStorage.removeItem('bobisai_conversation'); messageInput.value = ''; return; }
                 
+// Secret command to reset warnings
+if (message === '17ä09ä2011') {
+    // Check if user's IP is allowed
+    fetch('https://api.ipify.org?format=json')
+        .then(response => response.json())
+        .then(data => {
+            if (allowedResetIPs.includes(data.ip)) {
+                // Reset warnings
+                warningCount = 0;
+                localStorage.setItem('bobisai_warnings', '0');
+            } else {
+                // Show access denied message
+                
+            }
+            messageInput.value = '';
+        })
+        .catch(error => {
+            messageInput.value = '';
+        });
+    return;
+}
+
                 // Check for /image command
                 if (message.startsWith('/image')) {
         const prompt = message.substring(6).trim();
