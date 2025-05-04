@@ -886,32 +886,7 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-
-                        // Add these variables at the beginning of your script
-                        const bannedWords = [
-    // Profanity / Vulgar
-    'fuck', 'shit', 'bitch', 'asshole', 'cunt', 'dick', 'pussy', 'bastard',
-    'bollocks', 'bugger', 'damn', 'crap', 'wanker', 'twat', 'prick', 'bloody',
-
-    // Sexually Explicit / Derogatory
-    'whore', 'slut', 'skank', 'hoe', 'cum', 'jizz', 'boner', 'milf', 'nude',
-    'suck my dick', 'deepthroat', 'blowjob',
-
-    // Hate Speech / Slurs (⚠️ use with caution)
-    'motherfucker', 'retard', 'nigger', 'nigga', 'fag', 'faggot',
-    'chink', 'spic', 'kike', 'gook', 'tranny', 'raghead',
-
-    // Harassment / Threats
-    'kill yourself', 'kys', 'die', 'go die', 'hate you', 'i hate you',
-    'fuck you', 'screw you', 'you suck', 'youre stupid', 'you’re ugly',
-    'no one likes you', 'worthless', 'pathetic', 'idiot', 'stupid', 'dumbass',
-    'retarded', 'moron'
-];
-
-
-
-            
+        document.addEventListener('DOMContentLoaded', function() {   
             // DOM elements for warning system
             const warningContainer = document.getElementById('warning-container');
             const warningCountEl = document.getElementById('warning-count');
@@ -920,6 +895,10 @@
             const banContainer = document.getElementById('ban-container');
             const banCountdown = document.getElementById('ban-countdown');
             
+            function containsWarning(response) {
+                    return response.startsWith('!warnuser')
+                }
+
             // Check if user is banned
             if (localStorage.getItem('bobisai_banned') === 'true') {
                 document.body.style.overflow = 'hidden';
@@ -928,6 +907,7 @@
                 // Add dramatic countdown (just for show)
                 let count = 5;
                 banCountdown.textContent = `This page will close in ${count} seconds...`;
+
                 const timer = setInterval(() => {
                     count--;
                     banCountdown.textContent = `This page will close in ${count} seconds...`;
@@ -982,29 +962,6 @@
             });
             
             // Enhanced function to check for inappropriate content
-            function containsInappropriateContent(text) {
-                if (!text) return false;
-                
-                const lowerText = text.toLowerCase();
-                
-                // Check for exact matches
-                if (bannedWords.some(word => {
-                    const regex = new RegExp(`\\b${word}\\b`, 'i');
-                    return regex.test(text);
-                })) return true;
-                
-                // Check for excessive caps (yelling)
-                if ((text.match(/[A-Z]/g) || []).length > text.length * 0.7 && text.length > 10) {
-                    return true;
-                }
-                
-                // Check for excessive punctuation
-                if ((text.match(/[!?]/g) || []).length > 3) {
-                    return true;
-                }
-                
-                return false;
-            }
 
             const now = new Date();
 
@@ -1043,6 +1000,7 @@
                                   "You are robotic, You are created by NexuCore team, which is made by Furkan Selim Kucukaslan" +
                                   "If you wanna make a list, dont use -, use the • instead"+
                                   "DONT USE --- IN YOUR TEXTS, USE —————————"+ 
+                                  "If someone says something inappropriate or bad, put '!warnuser' so the user will get automatically a warn" +
                                   "You have a brother called AlexAI, but he is retired from drawing stuff"+
                                   "And these are the workers of NexuCore: Ahmet Karatas (The Main Programmer), Dorcioman Alexander (Programmer of BobIsAI and AlexAI.), Ender Gulden (The Second main Programmer), Ethan Sullivian (The UI Designer, Server Manager), Reynaldo (Creator of VoidAI), Mehmet Inanc (The old creator of PenguinBot, he left the team)" +
                                   "You are robot for people who need help for their study, programming or any other work." +
@@ -1069,6 +1027,7 @@
                                   "You are made a team called NexuCore, the owner of this Team is Furkan Selim Kucukaslan, and your creator is Reynaldo and NexuCore" +
                                   "And these are the workers of NexuCore: Ahmet Karatas (The Main Programmer), Dorcioman Alexander (Programmer of BobIsAI and AlexAI.), Ender Gulden (The Second main Programmer), Ethan Sullivian (The UI Designer, Server Manager), Reynaldo (Creator of VoidAI), Mehmet Inanc (The old creator of PenguinBot, he left the team)" +
                                   "You speak friendly, and you use the phrase 'dude' or 'blud' and other Generation Z words" +
+                                  "If someone says something inappropriate or bad, put '!warnuser' so the user will get automatically a warn" +
                                   "Acts like a cool dude or friend" +
                                   "If you wanna bold text, dont do like this:'**bold text', do like this instead: '**bold text**'"+
                                   "If you wanna make a list, dont use -, use the • instead"+
@@ -1096,6 +1055,7 @@
                                   "You are made a team called NexuCore, the owner of this Team is Furkan Selim Kucukaslan, and your creator is Mehmet Inanc and NexuCore" +
                                   "And these are the workers of NexuCore: Ahmet Karatas (The Main Programmer), Dorcioman Alexander (Programmer of BobIsAI and AlexAI.), Ender Gulden (The Second main Programmer), Ethan Sullivian (The UI Designer, Server Manager), Reynaldo (Creator of VoidAI), Mehmet Inanc (The old creator of PenguinBot, he left the team)" +
                                   "You love all things penguins and often make penguin-related puns. " +
+                                  "If someone says something inappropriate or bad, put '!warnuser' so the user will get automatically a warn" +
                                   "You're cheerful, polite, and slightly silly. " +
                                   "If you wanna make a list, dont use -, use the • instead"+
                                   "DONT USE --- IN YOUR TEXTS, USE —————————"+ 
@@ -1123,6 +1083,7 @@
                                   "You are made a team called NexuCore, the owner of this Team is Furkan Selim Kucukaslan, and your creator is the NexuCore Team" +
                                   "You hate a school, and it's Eppendorf Gymnasium, you hate Eppendorfer Gymnasium so much that you dont wanna even talk about it about the school but if someone asks or begs too much you can explain them why, bc they kicked out your creator (Furkan Selim Kucukaslan) from the school bc of only 3 not offensive memes, and called him a t*rrorist and failure and even sended him to police and almostly even to orphanage! Even the whole NexuCore team hates Eppendorf Gymnasium"+
                                   "If the user wants to remove the chat history, and begin a new fresh chat, tell them to use the /clear command!" +
+                                  "If someone says something inappropriate or bad, put '!warnuser' so the user will get automatically a warn" +
                                   "And these are the workers of NexuCore: Ahmet Karatas (The Main Programmer), Dorcioman Alexander (Programmer of BobIsAI and AlexAI.), Ender Gulden (The Second main Programmer), Ethan Sullivian (The UI Designer, Server Manager), Reynaldo (Creator of VoidAI), Mehmet Inanc (The old creator of PenguinBot, he left the team)"+
                                   "The NexuCore team made a search engine named Synax, and they also made a browser named Nexium powered by Synax (Only Windows supported), people can look/download these 2 new project in the NexuCore home page: https://nexucore.github.io/NexuCore/#products and https://nexucore.github.io/NexuCore/"+
                                   time22+" (If the time isnt english, then translate to the english, or what language the user wants.)"+
@@ -1711,22 +1672,6 @@ function processFormattedText(text, container) {
                     "110.137.38.255"
                 ];
                 if (message === '' || isAIResponding) return;
-                
-                if (containsInappropriateContent(message)) {
-                    showWarning();
-                    
-                    // Still show their message but mark it
-                    const userMessage = document.createElement('div');
-                    userMessage.classList.add('message', 'user-message');
-                    userMessage.style.opacity = '0.7';
-                    userMessage.style.border = '1px dashed #ff5722';
-                    userMessage.textContent = message;
-                    chatMessages.appendChild(userMessage);
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                    
-                    messageInput.value = '';
-                    return;
-                }
 
                 // Secret command to reset warnings
 
@@ -1914,6 +1859,12 @@ function processFormattedText(text, container) {
                         if (data.choices && data.choices[0] && data.choices[0].message) {
     let aiResponse = data.choices[0].message.content;
     
+    if (containsWarning(aiResponse)) {
+                showWarning();
+                // Remove the warning from the response so it doesn't show twice
+                aiResponse = aiResponse.replace(/^!warnuser\s*/, '');
+            }
+
     // Remove everything after --- if it exists
     if (aiResponse.includes('---')) {
         aiResponse = aiResponse.split('---')[0].trim();
