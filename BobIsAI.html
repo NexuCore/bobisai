@@ -114,6 +114,186 @@
     color: #ddd;
 }
 
+.warning-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .warning-container.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .warning-box {
+            background: linear-gradient(145deg, #fff8e1, #ffecb3);
+            border-radius: 12px;
+            padding: 25px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            border: 5px solid #ffc107;
+        }
+        
+        .warning-container.active .warning-box {
+            transform: scale(1);
+        }
+        
+        .warning-icon {
+            font-size: 50px;
+            color: #ff9800;
+            margin-bottom: 15px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .warning-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #d32f2f;
+            margin-bottom: 10px;
+        }
+        
+        .warning-text {
+            font-size: 16px;
+            color: #5d4037;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .warning-count {
+            font-size: 18px;
+            font-weight: bold;
+            background-color: #d32f2f;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        
+        .warning-progress {
+            height: 6px;
+            background-color: #e0e0e0;
+            border-radius: 3px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .warning-progress-bar {
+            height: 100%;
+            background-color: #d32f2f;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .warning-button {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .warning-button:hover {
+            background-color: #b71c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .ban-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #d32f2f, #b71c1c);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            flex-direction: column;
+        }
+        
+        .ban-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both infinite;
+        }
+        
+        .ban-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .ban-text {
+            font-size: 18px;
+            margin-bottom: 30px;
+            max-width: 500px;
+            line-height: 1.6;
+        }
+        
+        .ban-details {
+            background-color: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            max-width: 500px;
+        }
+        
+        .ban-countdown {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        
+        /* Add to existing message styles */
+        .message.warning-message {
+            background-color: #fff3e0;
+            color: #d32f2f;
+            border: 1px solid #ffcc80;
+            align-self: center;
+            max-width: 90%;
+            text-align: center;
+            font-weight: bold;
+            animation: none;
+            transform: none;
+            opacity: 1;
+        }
+
         .logo {
             font-weight: bold;
             color: var(--primary-color);
@@ -708,6 +888,168 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
+                        // Add these variables at the beginning of your script
+                        const bannedWords = [
+    // Profanity / Vulgar
+    'fuck', 'f*ck', 'f**k', 'f***', 'fuk', 'fuxk',
+    'shit', 'sh1t', 's**t', 'sh!t',
+    'bitch', 'b1tch', 'b!tch', 'b*tch', 'b***h',
+    'asshole', 'a**hole', 'a**h*le',
+    'cunt', 'c*nt', 'c**t',
+    'dick', 'd!ck', 'd1ck', 'd***',
+    'pussy', 'p*ssy', 'p***y',
+    'bastard', 'b*stard', 'b***ard',
+    'bollocks', 'b*llocks', 'b***ocks',
+    'bugger', 'b*gger',
+    'damn', 'd*mn',
+    'crap', 'cr@p',
+    'wanker', 'w*anker',
+    'twat', 'tw@t',
+    'prick', 'pr!ck', 'pr1ck',
+    'bloody',
+
+    // Sexually Explicit / Derogatory
+    'whore', 'wh*re', 'wh0re', 'w***e',
+    'slut', 'sl*t', 's1ut',
+    'skank', 'sk@nk',
+    'hoe', 'h0e',
+    'cum', 'c*m',
+    'jizz', 'j*zz',
+    'boner', 'b0ner',
+    'milf', 'm1lf',
+    'nude', 'n00d', 'n3de',
+    'suck my dick', 's*ck my d*ck', 'suck my d***',
+    'deepthroat',
+    'blowjob', 'bl*wjob',
+
+    // Hate Speech / Slurs
+    'motherfucker', 'motherf*cker', 'motherf***er',
+    'retard', 'r*tard', 'r3tard',
+    'nigger', 'nigga', 'n*gger', 'n*gga', 'ni**er', 'ni**a',
+    'fag', 'f@g', 'fa*g',
+    'faggot', 'f*ggot', 'fa**ot',
+    'chink', 'ch*nk',
+    'spic', 'sp1c',
+    'kike', 'k1ke',
+    'gook',
+    'tranny', 'tr@nny',
+    'raghead', 'r@ghead',
+
+    // Harassment / Threats
+    'kill yourself', 'kys', 'k!ll yourself', 'k!ll urself',
+    'die', 'go die',
+    'hate you', 'i hate you', 'h8 you',
+    'fuck you', 'f*ck you', 'f*** you',
+    'screw you', 'scr3w you',
+    'you suck', 'u suck', 'you s*ck',
+    'youre stupid', 'you’re stupid', 'ur stupid',
+    'you’re ugly', 'ur ugly',
+    'no one likes you',
+    'worthless', 'worthl3ss',
+    'pathetic',
+    'idiot', '1diot',
+    'stupid', 'stup1d', 'st00pid',
+    'dumbass', 'd*mbass',
+    'retarded', 'r3tarded',
+    'moron', 'm0ron'
+];
+
+
+            
+            // DOM elements for warning system
+            const warningContainer = document.getElementById('warning-container');
+            const warningCountEl = document.getElementById('warning-count');
+            const warningProgress = document.getElementById('warning-progress');
+            const warningAcknowledge = document.getElementById('warning-acknowledge');
+            const banContainer = document.getElementById('ban-container');
+            const banCountdown = document.getElementById('ban-countdown');
+            
+            // Check if user is banned
+            if (localStorage.getItem('bobisai_banned') === 'true') {
+                document.body.style.overflow = 'hidden';
+                banContainer.style.display = 'flex';
+                
+                // Add dramatic countdown (just for show)
+                let count = 5;
+                banCountdown.textContent = `This page will close in ${count} seconds...`;
+                const timer = setInterval(() => {
+                    count--;
+                    banCountdown.textContent = `This page will close in ${count} seconds...`;
+                    if (count <= 0) {
+                        clearInterval(timer);
+                        banCountdown.textContent = 'Closing...';
+                        setTimeout(() => {
+                            window.close();
+                        }, 1000);
+                    }
+                }, 1000);
+                
+                return; // Stop execution of the rest of the script
+            }
+            
+            // Get current warning count or initialize to 0
+            let warningCount = parseInt(localStorage.getItem('bobisai_warnings')) || 0;
+            
+            // Function to show warning
+            function showWarning() {
+                warningCount++;
+                localStorage.setItem('bobisai_warnings', warningCount.toString());
+                
+                // Update warning UI
+                warningCountEl.textContent = `Warning ${warningCount}/10`;
+                warningProgress.style.width = `${warningCount * 10}%`;
+                
+                // Also show in chat
+                const warningMessage = document.createElement('div');
+                warningMessage.classList.add('message', 'warning-message');
+                warningMessage.textContent = `⚠️ Warning ${warningCount}/10: Your message was flagged as inappropriate.`;
+                chatMessages.appendChild(warningMessage);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Show modal warning
+                warningContainer.classList.add('active');
+                
+                // Check if user should be banned
+                if (warningCount >= 10) {
+                    localStorage.setItem('bobisai_banned', 'true');
+                    setTimeout(() => {
+                        warningContainer.classList.remove('active');
+                        document.body.style.overflow = 'hidden';
+                        banContainer.style.display = 'flex';
+                    }, 2000);
+                }
+            }
+            
+            // Acknowledge warning
+            warningAcknowledge.addEventListener('click', function() {
+                warningContainer.classList.remove('active');
+            });
+            
+            // Enhanced function to check for inappropriate content
+            function containsInappropriateContent(text) {
+                if (!text) return false;
+                
+                const lowerText = text.toLowerCase();
+                
+                // Check for exact matches
+                if (bannedWords.some(word => {
+                    const regex = new RegExp(`\\b${word}\\b`, 'i');
+                    return regex.test(text);
+                })) return true;
+                
+                // Check for excessive caps (yelling)
+                if ((text.match(/[A-Z]/g) || []).length > text.length * 0.7 && text.length > 10) {
+                    return true;
+                }
+                
+                // Check for excessive punctuation
+                if ((text.match(/[!?]/g) || []).length > 3) {
+                    return true;
+                }
+                
+                return false;
+            }
 
             const now = new Date();
 
@@ -1423,6 +1765,22 @@ function processFormattedText(text, container) {
                 const message = messageInput.value.trim();
                 if (message === '' || isAIResponding) return;
                 
+                if (containsInappropriateContent(message)) {
+                    showWarning();
+                    
+                    // Still show their message but mark it
+                    const userMessage = document.createElement('div');
+                    userMessage.classList.add('message', 'user-message');
+                    userMessage.style.opacity = '0.7';
+                    userMessage.style.border = '1px dashed #ff5722';
+                    userMessage.textContent = message;
+                    chatMessages.appendChild(userMessage);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    
+                    messageInput.value = '';
+                    return;
+                }
+
                 if (message === '/clear') { chatMessages.innerHTML = ''; welcomeMessage.classList.remove('hidden'); conversationHistory = [{ role: "system", content: personalities[currentPersonality].systemMessage }]; localStorage.removeItem('bobisai_conversation'); messageInput.value = ''; return; }
                 
                 // Check for /image command
@@ -1706,5 +2064,32 @@ function processFormattedText(text, container) {
             loadConversation();
         });
     </script>
+        <div class="warning-container" id="warning-container">
+            <div class="warning-box">
+                <div class="warning-icon">⚠️</div>
+                <div class="warning-title">Content Warning</div>
+                <div class="warning-text">
+                    Your message contains inappropriate content. Please keep the conversation respectful.
+                </div>
+                <div class="warning-count" id="warning-count">Warning 1/10</div>
+                <div class="warning-progress">
+                    <div class="warning-progress-bar" id="warning-progress"></div>
+                </div>
+                <button class="warning-button" id="warning-acknowledge">I Understand</button>
+            </div>
+        </div>
+        
+        <div class="ban-container" id="ban-container" style="display: none;">
+            <div class="ban-icon">🚫</div>
+            <div class="ban-title">ACCOUNT SUSPENDED</div>
+            <div class="ban-text">
+                You have been permanently banned from using BobIsAI due to repeated violations of our content policy.
+            </div>
+            <div class="ban-details">
+                <p><strong>Reason:</strong> Excessive inappropriate content (10 warnings issued)</p>
+                <p><strong>Ban Type:</strong> Permanent (no appeals)</p>
+            </div>
+            <div class="ban-countdown" id="ban-countdown"></div>
+        </div>
 </body>
 </html>
