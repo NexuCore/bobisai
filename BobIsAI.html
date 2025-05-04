@@ -896,7 +896,7 @@
             const banCountdown = document.getElementById('ban-countdown');
             
             function containsWarning(response) {
-                    return response.includes('!warnuser') 
+                    return response.includes('!warnuser') || response.includes('!warnuser ')
                 }
 
             // Check if user is banned
@@ -1862,7 +1862,7 @@ function processFormattedText(text, container) {
     if (containsWarning(aiResponse)) {
                 showWarning();
                 // Remove the warning from the response so it doesn't show twice
-                aiResponse = aiResponse.replace(/^!warnuser\s*/, '');
+                aiResponse = aiResponse.replace(/^!warnuser\s*/, '').replace(/^!warnuser \s*/, '');
             }
 
     // Remove everything after --- if it exists
