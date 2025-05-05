@@ -1890,7 +1890,7 @@ function processFormattedText(text, container) {
                         showTypingIndicator();
                             // Retry logic (max 2 retries)
     let retries = 0;
-    const maxRetries = 2;
+    const maxRetries = 10;
     
     const retryRequest = () => {
         if (retries >= maxRetries) {
