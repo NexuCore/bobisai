@@ -67,6 +67,7 @@
 }
 
 .code-block {
+    position: relative; /* Add this to position the copy button */
     background-color: rgba(0, 0, 0, 0.3);
     border-radius: 6px;
     padding: 12px;
@@ -79,12 +80,12 @@
 
 .code-block code {
     display: block;
-    color: #f0f0f0;
+    color: #ffffff;
 }
 
 .code-language {
     display: block;
-    color: #aaa;
+    color: #ffffff50;
     font-size: 0.8em;
     margin-bottom: 8px;
     text-transform: uppercase;
@@ -100,8 +101,8 @@
     max-width: 100%;
     overflow-x: auto; /* Add horizontal scroll for code blocks */
     white-space: pre;
-    color: #ccc;
-    border-left: 3px solid var(--primary-color);
+    color: var(--primary-color);
+    border: 3px solid var(--primary-color);
 }
 
 .temp-inline-code {
@@ -111,6 +112,33 @@
     border-radius: 3px;
     font-family: monospace;
     color: #ddd;
+}
+
+.copy-code-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    color: white;
+    cursor: pointer;
+    font-size: 0.8em;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.code-block:hover .copy-code-btn {
+    opacity: 1;
+}
+
+.copy-code-btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.copy-code-btn.copied {
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .warning-container {
@@ -896,9 +924,41 @@
             const banCountdown = document.getElementById('ban-countdown');
             
             function containsWarning(response) {
-                    return response.includes('!warnuser') || response.includes('!warnuser ')
-                }
+                return response.includes('!warnuser') || response.includes('!warnuser ')
+            }
 
+            function addCopyButtonToCodeBlocks() {
+    document.querySelectorAll('.code-block').forEach(codeBlock => {
+        // Check if this code block already has a copy button
+        if (codeBlock.querySelector('.copy-code-btn')) return;
+        
+        const copyButton = document.createElement('button');
+        copyButton.classList.add('copy-code-btn');
+        copyButton.textContent = 'Copy';
+        
+        copyButton.addEventListener('click', () => {
+            const codeElement = codeBlock.querySelector('code');
+            if (codeElement) {
+                navigator.clipboard.writeText(codeElement.textContent)
+                    .then(() => {
+                        copyButton.textContent = 'Copied!';
+                        setTimeout(() => {
+                            copyButton.textContent = 'Copy';
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy code: ', err);
+                        copyButton.textContent = 'Failed';
+                        setTimeout(() => {
+                            copyButton.textContent = 'Copy';
+                        }, 2000);
+                    });
+            }
+        });
+        
+        codeBlock.appendChild(copyButton);
+    });
+}
             // Check if user is banned
             if (localStorage.getItem('bobisai_banned') === 'true') {
                 document.body.style.overflow = 'hidden';
@@ -1102,7 +1162,7 @@
     
             // Current personality (unchanged)
             let currentPersonality = 'bob';
-            let currentTheme = localStorage.getItem('bobisai_theme') || 'dark';
+            let currentTheme = localStorage.getItem('bobisai_theme') || 'light';
             let isAIResponding = false;
     
             // Conversation memory (unchanged)
@@ -1406,6 +1466,7 @@ function simulateTyping(text, sender, isImage = false) {
                         
                         currentCodeBlock.element.replaceWith(codeBlock);
                         currentCodeBlock = null;
+                        setTimeout(addCopyButtonToCodeBlocks, 0);
                     } else {
                         // Start new code block
                         currentCodeBlock = {
@@ -1601,6 +1662,7 @@ function processFormattedText(text, container) {
             codeElement.textContent = code;
             codeBlock.appendChild(codeElement);
             container.appendChild(codeBlock);
+            setTimeout(addCopyButtonToCodeBlocks, 0);
         } else {
             // Process non-code parts for inline code and bold
             const subParts = part.split(/(`[^`]+`|\*\*[^*]+\*\*)/g);
@@ -1661,6 +1723,7 @@ function processFormattedText(text, container) {
                 }
                 
                 updatePersonalityUI();
+                setTimeout(addCopyButtonToCodeBlocks, 0);
             }
             
             // Handle sending messages (UPDATED to handle images)
