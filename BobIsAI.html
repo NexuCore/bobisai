@@ -923,6 +923,160 @@
             const banContainer = document.getElementById('ban-container');
             const banCountdown = document.getElementById('ban-countdown');
             
+            // DDoS protection script for client-side mitigation
+(function() {
+    'use strict';
+
+    // Configuration
+    const config = {
+        maxRequestsPerMinute: 60, // Normal users won't make more than 60 requests/min
+        blockDuration: 15 * 60 * 1000, // 15 minutes block duration
+        localStorageKey: 'ddosProtectionData',
+        challengeEnabled: true,
+        debugMode: false // Set to true to see console logs
+    };
+
+    // Initialize protection data
+    let protectionData = JSON.parse(localStorage.getItem(config.localStorageKey)) || {
+        requestCount: 0,
+        lastRequestTime: Date.now(),
+        isBlocked: false,
+        blockUntil: 0
+    };
+
+    // Debug logging
+    function debugLog(message) {
+        if (config.debugMode) {
+            console.log(`[DDoS Protection] ${message}`);
+        }
+    }
+
+    // Save protection data to localStorage
+    function saveProtectionData() {
+        localStorage.setItem(config.localStorageKey, JSON.stringify(protectionData));
+    }
+
+    // Check if the client is currently blocked
+    function isBlocked() {
+        if (protectionData.isBlocked && Date.now() < protectionData.blockUntil) {
+            return true;
+        }
+        
+        if (protectionData.isBlocked && Date.now() >= protectionData.blockUntil) {
+            protectionData.isBlocked = false;
+            protectionData.blockUntil = 0;
+            protectionData.requestCount = 0;
+            saveProtectionData();
+            debugLog("Block period ended. Resetting protection data.");
+        }
+        
+        return false;
+    }
+
+    // Block the client
+    function blockClient() {
+        protectionData.isBlocked = true;
+        protectionData.blockUntil = Date.now() + config.blockDuration;
+        saveProtectionData();
+        debugLog(`Client blocked for ${config.blockDuration/60000} minutes.`);
+        
+        // You could redirect to a blocked page or show a message
+        document.body.innerHTML = '<h1>Access Temporarily Blocked</h1><p>Your access has been temporarily restricted due to excessive requests. Please try again later.</p>';
+        throw new Error('Access blocked due to excessive requests');
+    }
+
+    // Simple JavaScript challenge
+    function performChallenge() {
+        debugLog("Performing challenge...");
+        const a = Math.floor(Math.random() * 10) + 1;
+        const b = Math.floor(Math.random() * 10) + 1;
+        const answer = a + b;
+        
+        const userAnswer = prompt(`To continue, please solve this simple math problem: ${a} + ${b} = ?`);
+        
+        if (parseInt(userAnswer) !== answer) {
+            blockClient();
+        } else {
+            debugLog("Challenge passed.");
+            protectionData.requestCount = 0; // Reset counter after successful challenge
+            saveProtectionData();
+        }
+    }
+
+    // Main protection function
+    function protect() {
+        const now = Date.now();
+        const timeSinceLastRequest = now - protectionData.lastRequestTime;
+        
+        // Reset count if more than 1 minute has passed
+        if (timeSinceLastRequest > 60000) {
+            protectionData.requestCount = 0;
+            protectionData.lastRequestTime = now;
+            saveProtectionData();
+            debugLog("Request count reset (new minute).");
+            return;
+        }
+        
+        // Update request count and time
+        protectionData.requestCount++;
+        protectionData.lastRequestTime = now;
+        saveProtectionData();
+        
+        debugLog(`Request count: ${protectionData.requestCount}`);
+        
+        // Check if blocked
+        if (isBlocked()) {
+            blockClient();
+            return;
+        }
+        
+        // Check rate limit
+        if (protectionData.requestCount > config.maxRequestsPerMinute) {
+            if (config.challengeEnabled) {
+                performChallenge();
+            } else {
+                blockClient();
+            }
+        }
+    }
+
+    // Run protection on page load
+    protect();
+
+    // Optional: Add event listeners for other suspicious behaviors
+    window.addEventListener('load', function() {
+        // Protect against rapid clicking
+        document.addEventListener('click', function(e) {
+            protect();
+        }, true); // Capture phase to catch all clicks
+        
+        // Protect against rapid form submissions
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                protect();
+            });
+        });
+    });
+
+    // Optional: Add protection for AJAX requests if you're using any
+    if (window.XMLHttpRequest) {
+        const originalXHROpen = XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function() {
+            protect();
+            return originalXHROpen.apply(this, arguments);
+        };
+    }
+
+    if (window.fetch) {
+        const originalFetch = window.fetch;
+        window.fetch = function() {
+            protect();
+            return originalFetch.apply(this, arguments);
+        };
+    }
+})();
+
             function containsWarning(response) {
                 return response.includes('!warnuser') || response.includes('!warnuser ')
             }
