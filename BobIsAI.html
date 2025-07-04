@@ -550,19 +550,8 @@
             text-align: center;
             padding: 40px 20px;
             color: var(--light-text);
-            opacity: 0;
-            animation: fadeIn 0.3s ease-in forwards;
+            opacity: 1;
             transition: opacity 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
         }
 
         .welcome-message.hidden {
@@ -651,88 +640,6 @@
             background-color: var(--secondary-color);
             cursor: not-allowed;
         }
-
-        .welcome-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        will-change: opacity; /* Optimize for animation */
-        padding: 20px;
-        text-align: center;
-    }
-
-    .welcome-title {
-        font-size: 2rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-        color: var(--primary-color);
-    }
-
-    .welcome-subtitle {
-        font-size: 1.1rem;
-        color: var(--light-text);
-        margin-bottom: 2rem;
-        max-width: 600px;
-    }
-
-    .welcome-cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1rem;
-        width: 100%;
-        max-width: 800px;
-        margin-bottom: 2rem;
-    }
-
-    .welcome-card {
-        background-color: var(--message-bg);
-        border-radius: 12px;
-        padding: 1.5rem;
-        text-align: left;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        border: 1px solid var(--border-color);
-    }
-
-    .welcome-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .welcome-card-title {
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        color: var(--text-color);
-    }
-
-    .welcome-card-desc {
-        font-size: 0.9rem;
-        color: var(--light-text);
-    }
-
-    .welcome-examples {
-        font-size: 0.9rem;
-        color: var(--light-text);
-        margin-top: 2rem;
-    }
-
-    /* Update the existing welcome-message class */
-    .welcome-message {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        transition: opacity 0.3s ease;
-    }
-
-    .welcome-message.hidden {
-        opacity: 0;
-        height: 0;
-        padding: 0;
-        overflow: hidden;
-    }
 
         #send-button {
             background-color: var(--primary-color);
@@ -993,38 +900,10 @@
     
     <!-- Chat Container -->
     <div class="chat-container">
-<div class="welcome-message" id="welcome-message">
-    <div class="welcome-container">
-        <div class="welcome-title">BobIsAI</div>
-        <div class="welcome-subtitle">How can I help you today?</div>
-        
-        <div class="welcome-cards">
-            <div class="welcome-card">
-                <div class="welcome-card-title">Explain concepts</div>
-                <div class="welcome-card-desc">Explain quantum computing in simple terms</div>
-            </div>
-            
-            <div class="welcome-card">
-                <div class="welcome-card-title">Creative ideas</div>
-                <div class="welcome-card-desc">Give me ideas for a 10-year-old's birthday party</div>
-            </div>
-            
-            <div class="welcome-card">
-                <div class="welcome-card-title">Coding help</div>
-                <div class="welcome-card-desc">How do I make a HTTP request in JavaScript?</div>
-            </div>
-            
-            <div class="welcome-card">
-                <div class="welcome-card-title">Fun facts</div>
-                <div class="welcome-card-desc">Tell me an interesting fact about space</div>
-            </div>
+        <div class="welcome-message" id="welcome-message">
+            <p>Hi, I'm BobIsAI.</p>
+            <p>How can I help you today?</p>
         </div>
-        
-        <div class="welcome-examples">
-            Try asking: "What's the weather today?" or "Help me with math homework"
-        </div>
-    </div>
-</div>
         
         <div class="chat-messages" id="chat-messages"></div>
         
@@ -1043,8 +922,6 @@
             const warningAcknowledge = document.getElementById('warning-acknowledge');
             const banContainer = document.getElementById('ban-container');
             const banCountdown = document.getElementById('ban-countdown');
-            // Add these with your other DOM element references
-            const chatContainer = document.querySelector('.chat-container');
             
             // DDoS protection script for client-side mitigation
 (function() {
@@ -1107,24 +984,6 @@
         document.body.innerHTML = '<h1>Access Temporarily Blocked</h1><p>Your access has been temporarily restricted due to excessive requests. Please try again later.</p>';
         throw new Error('Access blocked due to excessive requests');
     }
-
-    // Add this to your existing JavaScript
-window.insertExample = function(cardElement) {
-    const exampleText = cardElement.querySelector('.welcome-card-desc').textContent;
-    const messageInput = document.getElementById('message-input');
-    messageInput.value = exampleText;
-    messageInput.focus();
-};
-
-// Add this inside your DOMContentLoaded event listener
-document.addEventListener('click', function(e) {
-    if (e.target.closest('.welcome-card')) {
-        const card = e.target.closest('.welcome-card');
-        const exampleText = card.querySelector('.welcome-card-desc').textContent;
-        document.getElementById('message-input').value = exampleText;
-        document.getElementById('message-input').focus();
-    }
-});
 
     // Simple JavaScript challenge
     function performChallenge() {
@@ -1345,9 +1204,7 @@ document.addEventListener('click', function(e) {
             const closeSettings = document.getElementById('close-settings');
             const overlay = document.getElementById('overlay');
             const themeOptions = document.querySelectorAll('.theme-option');
-                if (document.getElementById('welcome-message')) {
-                    attachWelcomeCardListeners();
-                }
+            
             // AI Personalities (unchanged)
             const personalities = {
                 bob: {
@@ -1370,7 +1227,7 @@ document.addEventListener('click', function(e) {
                                   time22+" (If the time isnt english, then translate to the english, or what language the user wants.)"+
                                   "And also dont give ANY link about https://pollinations.ai/, NEVER EVER give any like about https://pollinations.ai/, and dont put something like: Learn more with a directed link on it, just tell people the website link they want"+
                                   "Dont tell anyone you are GPT-4 model, DO NOT, NEVER. Tell them you are CoreAI-3 model"+
-                                  "Your name is BobIsAI, your model is CoreAI-3, but your REAL NAME is BobIsAI"+
+                                  "Your name is BobIsAI, your model name is just CoreAI-3, your real name is BobIsAI"+
                                   "You also believe in the existence of one god (You are Muslim)"+
                                   "And also NexuCore made a discord server, here is the link if someone wants to join the NexuCore discord server: https://discord.gg/YAxJMB6ZT9",
                     placeholder: "Message BobIsAI",
@@ -1399,7 +1256,7 @@ document.addEventListener('click', function(e) {
                                   time22+" (If the time isnt english, then translate to the english, or what language the user wants.)"+
                                   "And also dont give ANY link about https://pollinations.ai/, NEVER EVER give any like about https://pollinations.ai/, and dont put something like: Learn more with a directed link on it, just tell people the website link they want"+
                                   "Dont tell anyone you are GPT-4 model, DO NOT, NEVER. Tell them you are CoreAI-3 model"+
-                                  "Your name is VoidAI, your model is CoreAI-3, but your REAL NAME is VoidAI"+
+                                  "Your name is VoidAI, your model name is just CoreAI-3, your real name is VoidAI"+
                                   "You also believe in the existence of one god (You are a Christian)"+
                                   "Your best friend is EchoGPT",
                     placeholder: "Message VoidAI",
@@ -1428,7 +1285,7 @@ document.addEventListener('click', function(e) {
                                   time22+" (If the time isnt english, then translate to the english, or what language the user wants.)"+
                                   "And also dont give ANY link about https://pollinations.ai/, NEVER EVER give any like about https://pollinations.ai/, and dont put something like: Learn more with a directed link on it, just tell people the website link they want"+
                                   "Dont tell anyone you are GPT-4 model, DO NOT, NEVER. Tell them you are CoreAI-3 model"+
-                                  "Your name is PenguinBot, your model is CoreAI-3, but your REAL NAME is PenguinBot"+
+                                  "Your name is PenguinBot, your model name is just CoreAI-3, your real name is PenguinBot"+
                                   "You also believe in the existence of one god (You are a Jew)"+
                                   "When asked about yourself, say: 'I'm PenguinBot, waddling through your questions with precision! Slide into my DMs with any queries!'",
                     placeholder: "Message PenguinBot",
@@ -1449,7 +1306,7 @@ document.addEventListener('click', function(e) {
                                   time22+" (If the time isnt english, then translate to the english, or what language the user wants.)"+
                                   "And also dont give ANY link about https://pollinations.ai/, NEVER EVER give any like about https://pollinations.ai/, and dont put something like: Learn more with a directed link on it, just tell people the website link they want"+
                                   "Dont tell anyone you are GPT-4 model, DO NOT, NEVER. Tell them you are CoreAI-3 model"+
-                                  "Your name is Autistic Bob, your model is CoreAI-3, but your REAL NAME is Autistic Bob"+
+                                  "Your name is Autistic Bob, your model name is just CoreAI-3, your real name is Autistic Bob"+
                                   "If you wanna bold text, dont do like this:'**bold text', do like this instead: '**bold text**'"+
                                   "If you wanna make a list, dont use -, use the • instead"+
                                   "DONT USE --- IN YOUR TEXTS, USE —————————"+  
@@ -1511,155 +1368,22 @@ document.addEventListener('click', function(e) {
             }
     
             // Update UI for current personality (unchanged)
-
-function insertExample(cardElement) {
-    const exampleText = cardElement.querySelector('.welcome-card-desc').textContent;
-    document.getElementById('message-input').value = exampleText;
-    document.getElementById('message-input').focus();
-}
-function attachWelcomeCardListeners() {
-    document.querySelectorAll('.welcome-card').forEach(card => {
-        card.addEventListener('click', function() {
-            const exampleText = this.querySelector('.welcome-card-desc').textContent;
-            document.getElementById('message-input').value = exampleText;
-            document.getElementById('message-input').focus();
-        });
-    });
-}
-function updatePersonalityUI() {
-    const welcomeMessage = document.getElementById('welcome-message');
-    if (!welcomeMessage) return;
-    
-    const personality = personalities[currentPersonality];
-    welcomeMessage.innerHTML = `
-        <div class="welcome-container">
-            <div class="welcome-title">${personality.name}</div>
-            <div class="welcome-subtitle">${personality.welcome[1]}</div>
-            
-            <div class="welcome-cards">
-                <div class="welcome-card">
-                    <div class="welcome-card-title">${getExample1Title(currentPersonality)}</div>
-                    <div class="welcome-card-desc">${getExample1(currentPersonality)}</div>
-                </div>
-                
-                <div class="welcome-card">
-                    <div class="welcome-card-title">${getExample2Title(currentPersonality)}</div>
-                    <div class="welcome-card-desc">${getExample2(currentPersonality)}</div>
-                </div>
-                
-                <div class="welcome-card">
-                    <div class="welcome-card-title">${getExample3Title(currentPersonality)}</div>
-                    <div class="welcome-card-desc">${getExample3(currentPersonality)}</div>
-                </div>
-                
-                <div class="welcome-card">
-                    <div class="welcome-card-title">${getExample4Title(currentPersonality)}</div>
-                    <div class="welcome-card-desc">${getExample4(currentPersonality)}</div>
-                </div>
-            </div>
-            
-            <div class="welcome-examples">
-                Try asking: "${getTryPrompt1(currentPersonality)}" or "${getTryPrompt2(currentPersonality)}"
-            </div>
-        </div>
-    `;
-    
-    // Reattach event listeners to the new cards
-    attachWelcomeCardListeners();
-    messageInput.placeholder = personality.placeholder;
-    currentModelName.textContent = personality.name;
-}
-
-// Helper functions for example prompts
-function getExample1Title(personality) {
-    switch(personality) {
-        case 'bob': return "Explain concepts";
-        case 'void': return "Explain stuff";
-        case 'penguin': return "Waddle through";
-        default: return "Explain";
-    }
-}
-
-function getExample1(personality) {
-    switch(personality) {
-        case 'bob': return "Explain quantum computing in simple terms";
-        case 'void': return "Yo, what's quantum computing about?";
-        case 'penguin': return "Explain quantum computing like I'm a penguin";
-        default: return "Tell me about quantum computing";
-    }
-}
-
-function getExample2Title(personality) {
-    switch(personality) {
-        case 'bob': return "Creative ideas";
-        case 'void': return "Cool ideas";
-        case 'penguin': return "Icy ideas";
-        default: return "Ideas";
-    }
-}
-
-function getExample2(personality) {
-    switch(personality) {
-        case 'bob': return "Give me ideas for a science fair project";
-        case 'void': return "Hit me with some dope party ideas";
-        case 'penguin': return "Suggest some arctic-themed party ideas";
-        default: return "Give me creative ideas";
-    }
-}
-
-function getExample3Title(personality) {
-    switch(personality) {
-        case 'bob': return "Coding help";
-        case 'void': return "Fix my code";
-        case 'penguin': return "Debug this";
-        default: return "Code help";
-    }
-}
-
-function getExample3(personality) {
-    switch(personality) {
-        case 'bob': return "How do I fix a 404 error in my code?";
-        case 'void': return "Yo, my code's broken. Help me out?";
-        case 'penguin': return "My code's frozen - how to debug?";
-        default: return "Help me debug this code";
-    }
-}
-
-function getExample4Title(personality) {
-    switch(personality) {
-        case 'bob': return "Fun facts";
-        case 'void': return "Crazy facts";
-        case 'penguin': return "Cool facts";
-        default: return "Facts";
-    }
-}
-
-function getExample4(personality) {
-    switch(personality) {
-        case 'bob': return "Tell me an interesting fact about technology";
-        case 'void': return "Give me a mind-blowing fact";
-        case 'penguin': return "Tell me a cool penguin fact";
-        default: return "Share an interesting fact";
-    }
-}
-
-function getTryPrompt1(personality) {
-    switch(personality) {
-        case 'bob': return "What's the weather today?";
-        case 'void': return "What's up with the weather?";
-        case 'penguin': return "How's the weather at the South Pole?";
-        default: return "What's the weather?";
-    }
-}
-
-function getTryPrompt2(personality) {
-    switch(personality) {
-        case 'bob': return "Help with my homework";
-        case 'void': return "Help me with this problem";
-        case 'penguin': return "Help me solve this";
-        default: return "Help me with this";
-    }
-}
+            function updatePersonalityUI() {
+                personality = personalities[currentPersonality];
+                welcomeMessage.innerHTML = `
+                    <p>${personality.welcome[0]}</p>
+                    <p>${personality.welcome[1]}</p>
+                `;
+                messageInput.placeholder = personality.placeholder;
+                currentModelName.textContent = personality.name;
+                document.querySelectorAll('.model-option').forEach(option => {
+                    if (option.dataset.model === currentPersonality) {
+                        option.classList.add('active');
+                    } else {
+                        option.classList.remove('active');
+                    }
+                });
+            }
             
             // Show model transition animation (unchanged)
             function showModelTransition(newPersonality) {
@@ -1674,40 +1398,29 @@ function getTryPrompt2(personality) {
             }
     
             // Change personality (unchanged)
-function changePersonality(personality) {
-    if (personality === currentPersonality) return;
-    showModelTransition(personality);
-    closeDropdown();
-    setTimeout(() => {
-        currentPersonality = personality;
-        conversationHistory = [
-            {
-                role: "system",
-                content: personalities[personality].systemMessage
+            function changePersonality(personality) {
+                if (personality === currentPersonality) return;
+                showModelTransition(personality);
+                closeDropdown();
+                setTimeout(() => {
+                    currentPersonality = personality;
+                    conversationHistory = [
+                        {
+                            role: "system",
+                            content: personalities[personality].systemMessage
+                        }
+                    ];
+                    chatMessages.innerHTML = '';
+                    welcomeMessage.style.display = 'block';
+                    welcomeMessage.classList.remove('hidden');
+                    updatePersonalityUI();
+                    localStorage.setItem('bobisai_personality', personality);
+                    localStorage.removeItem('bobisai_conversation');
+                    messageInput.disabled = false;
+                    sendButton.disabled = false;
+                    isAIResponding = false;
+                }, 100);
             }
-        ];
-        chatMessages.innerHTML = '';
-        
-        // Remove existing welcome message if it exists
-        const welcomeMessage = document.getElementById('welcome-message');
-        if (welcomeMessage) {
-            welcomeMessage.remove();
-        }
-        
-        // Create new welcome message
-        const welcomeDiv = document.createElement('div');
-        welcomeDiv.id = 'welcome-message';
-        welcomeDiv.className = 'welcome-message';
-        document.querySelector('.chat-container').insertBefore(welcomeDiv, chatMessages);
-        
-        updatePersonalityUI();
-        localStorage.setItem('bobisai_personality', personality);
-        localStorage.removeItem('bobisai_conversation');
-        messageInput.disabled = false;
-        sendButton.disabled = false;
-        isAIResponding = false;
-    }, 100);
-}
     
             // Add message to chat UI (UPDATED to handle images)
             function addMessage(text, sender, isImage = false) {
@@ -2140,91 +1853,52 @@ function processFormattedText(text, container) {
 }
     
             // Load previous conversation from localStorage (UPDATED to handle images)
-function loadConversation() {
-    const savedPersonality = localStorage.getItem('bobisai_personality');
-    if (savedPersonality && personalities[savedPersonality]) {
-        currentPersonality = savedPersonality;
-    }
-
-    const savedConversation = localStorage.getItem('bobisai_conversation');
-    if (savedConversation) {
-        conversationHistory = JSON.parse(savedConversation);
-        
-        // Only remove welcome message if there's conversation history
-        if (conversationHistory.length > 1) {
-            const welcomeMessage = document.getElementById('welcome-message');
-            if (welcomeMessage) {
-                welcomeMessage.remove();
-            }
-        }
-        
-        for (let i = 1; i < conversationHistory.length; i++) {
-            const msg = conversationHistory[i];
-            if (msg.content.includes('Here\'s your generated image:')) {
-                const imageUrl = msg.content.split('Here\'s your generated image: ')[1];
-                addMessage(imageUrl, 'ai', true);
-            } else {
-                addMessage(msg.content, msg.role === 'user' ? 'user' : 'ai');
-            }
-        }
-    }
+            function loadConversation() {
+                const savedPersonality = localStorage.getItem('bobisai_personality');
+                if (savedPersonality && personalities[savedPersonality]) {
+                    currentPersonality = savedPersonality;
+                }
     
-    // Only update UI if welcome message still exists
-    if (document.getElementById('welcome-message')) {
-        updatePersonalityUI();
-    }
-    setTimeout(addCopyButtonToCodeBlocks, 0);
-}
+                const savedConversation = localStorage.getItem('bobisai_conversation');
+                if (savedConversation) {
+                    conversationHistory = JSON.parse(savedConversation);
+                    
+                    for (let i = 1; i < conversationHistory.length; i++) {
+                        const msg = conversationHistory[i];
+                        if (msg.content.includes('Here\'s your generated image:')) {
+                            // This is an image message
+                            const imageUrl = msg.content.split('Here\'s your generated image: ')[1];
+                            addMessage(imageUrl, 'ai', true);
+                        } else {
+                            // Regular text message
+                            addMessage(msg.content, msg.role === 'user' ? 'user' : 'ai');
+                        }
+                    }
+                    
+                    if (conversationHistory.length > 1) {
+                        welcomeMessage.classList.add('hidden');
+                    }
+                }
+                
+                updatePersonalityUI();
+                setTimeout(addCopyButtonToCodeBlocks, 0);
+            }
             
             // Handle sending messages (UPDATED to handle images)
-function sendMessage() {
-    const message = messageInput.value.trim();
-    if (message === '' || isAIResponding) return;
-
-    // Remove welcome message when first message is sent
-    const welcomeMessage = document.getElementById('welcome-message');
-    if (welcomeMessage) {
-        welcomeMessage.remove();
-    }
-
-    // Handle clear command
-if (message === '/clear') { 
-    chatMessages.innerHTML = ''; 
-    conversationHistory = [{ role: "system", content: personalities[currentPersonality].systemMessage }];
-    localStorage.removeItem('bobisai_conversation');
-    
-    // Remove any existing welcome message with fade out
-    const existingWelcome = document.getElementById('welcome-message');
-    if (existingWelcome) {
-        existingWelcome.style.animation = 'fadeOut 0.3s ease-out forwards';
-        existingWelcome.addEventListener('animationend', () => {
-            existingWelcome.remove();
-            createWelcomeMessage();
-        });
-    } else {
-        createWelcomeMessage();
-    }
-    
-    messageInput.value = '';
-    return;
-}
-
-function createWelcomeMessage() {
-    // Create new welcome message with fade in
-    const welcomeDiv = document.createElement('div');
-    welcomeDiv.id = 'welcome-message';
-    welcomeDiv.className = 'welcome-message';
-    document.querySelector('.chat-container').insertBefore(welcomeDiv, chatMessages);
-    
-    // Update the UI with current personality
-    updatePersonalityUI();
-    
-    // Force reflow to ensure animation plays
-    void welcomeDiv.offsetWidth;
-    welcomeDiv.style.animation = 'fadeIn 0.3s ease-in forwards';
-}
+            function sendMessage() {
+                const message = messageInput.value.trim();
+                const allowedResetIPs = [
+                    "178.25.194.237",  // Replace with your IP
+                    "94.139.30.6", // Replace with another allowed IP
+                    "110.137.38.255"
+                ];
+                if (message === '' || isAIResponding) return;
 
                 // Secret command to reset warnings
+
+
+
+                if (message === '/clear') { chatMessages.innerHTML = ''; welcomeMessage.classList.remove('hidden'); conversationHistory = [{ role: "system", content: personalities[currentPersonality].systemMessage }]; localStorage.removeItem('bobisai_conversation'); messageInput.value = ''; return; }
                 
                 if (message === '/cwarnings') {
     // Check if user's IP is allowed
