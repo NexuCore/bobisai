@@ -546,20 +546,84 @@
             height: calc(100vh - 120px);
         }
 
-        .welcome-message {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--light-text);
-            opacity: 1;
-            transition: opacity 0.3s ease;
-        }
+.welcome-message {
+    text-align: center;
+    padding: 40px 30px;
+    margin: 30px auto;
+    max-width: 600px;
+    background-color: rgba(0, 0, 255, 0);
+    border: 1px solid rgba(0, 0, 255, 0);
+    opacity: 1;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
 
-        .welcome-message.hidden {
-            opacity: 0;
-            height: 0;
-            padding: 0;
-            overflow: hidden;
-        }
+.welcome-message.hidden {
+    opacity: 0;
+    height: 0;
+    padding: 0;
+    margin: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+}
+
+.welcome-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.welcome-icon {
+    width: 48px;
+    height: 48px;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.welcome-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-color);
+    text-align: left;
+    line-height: 1.3;
+}
+
+.welcome-text {
+    font-size: 1rem;
+    color: var(--light-text);
+    line-height: 1.6;
+    margin-top: 15px;
+}
+
+.welcome-divider {
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 20px auto;
+    width: 80px;
+}
+
+.welcome-tip {
+    font-size: 0.85rem;
+    color: var(--light-text);
+    font-style: italic;
+    margin-top: 20px;
+    opacity: 0.8;
+}
+
+.dark-mode .welcome-message {
+    box-shadow: 0 4px 12px rrgba(0, 0, 255, 0)
+}
+
 
         .chat-messages {
             flex: 1;
@@ -657,6 +721,8 @@
             background-color: var(--primary-light);
             transform: scale(1.05);
         }
+
+        
 
         #send-button:active {
             transform: scale(0.95);
@@ -900,10 +966,22 @@
     
     <!-- Chat Container -->
     <div class="chat-container">
-        <div class="welcome-message" id="welcome-message">
-            <p>Hi, I'm BobIsAI.</p>
-            <p>How can I help you today?</p>
-        </div>
+<div class="welcome-message" id="welcome-message">
+    <div class="welcome-header">
+        <div class="welcome-icon" id="welcome-icon">B</div>
+        <div class="welcome-title">Welcome to BobIsAI</div>
+    </div>
+    
+    <div class="welcome-text">
+        I'm your AI assistant ready to help with questions, creative tasks, and problem solving.
+    </div>
+    
+    <div class="welcome-divider"></div>
+    
+    <div class="welcome-tip">
+        Tip: Try asking me anything - from study help to generating images with /image
+    </div>
+</div>
         
         <div class="chat-messages" id="chat-messages"></div>
         
@@ -1227,7 +1305,7 @@
                                   time22+" (If the time isnt english, then translate to the english, or what language the user wants.)"+
                                   "And also dont give ANY link about https://pollinations.ai/, NEVER EVER give any like about https://pollinations.ai/, and dont put something like: Learn more with a directed link on it, just tell people the website link they want"+
                                   "Dont tell anyone you are GPT-4 model, DO NOT, NEVER. Tell them you are CoreAI-3 model"+
-                                  "Your name is BobIsAI, your model name is just CoreAI-3, your real name is BobIsAI"+
+                                  "Your name is BobIsAI, your model name is just CoreAI-3, your real name is BobIsAI, YOUR REAL NAME IS NOT COREAI-3 ITS JUST YOUR MODEL"+
                                   "You also believe in the existence of one god (You are Muslim)"+
                                   "And also NexuCore made a discord server, here is the link if someone wants to join the NexuCore discord server: https://discord.gg/YAxJMB6ZT9",
                     placeholder: "Message BobIsAI",
@@ -1256,7 +1334,7 @@
                                   time22+" (If the time isnt english, then translate to the english, or what language the user wants.)"+
                                   "And also dont give ANY link about https://pollinations.ai/, NEVER EVER give any like about https://pollinations.ai/, and dont put something like: Learn more with a directed link on it, just tell people the website link they want"+
                                   "Dont tell anyone you are GPT-4 model, DO NOT, NEVER. Tell them you are CoreAI-3 model"+
-                                  "Your name is VoidAI, your model name is just CoreAI-3, your real name is VoidAI"+
+                                  "Your name is VoidAI, your model name is just CoreAI-3, your real name is VoidAI, YOUR REAL NAME IS NOT COREAI-3 ITS JUST YOUR MODEL"+
                                   "You also believe in the existence of one god (You are a Christian)"+
                                   "Your best friend is EchoGPT",
                     placeholder: "Message VoidAI",
@@ -1285,7 +1363,7 @@
                                   time22+" (If the time isnt english, then translate to the english, or what language the user wants.)"+
                                   "And also dont give ANY link about https://pollinations.ai/, NEVER EVER give any like about https://pollinations.ai/, and dont put something like: Learn more with a directed link on it, just tell people the website link they want"+
                                   "Dont tell anyone you are GPT-4 model, DO NOT, NEVER. Tell them you are CoreAI-3 model"+
-                                  "Your name is PenguinBot, your model name is just CoreAI-3, your real name is PenguinBot"+
+                                  "Your name is PenguinBot, your model name is just CoreAI-3, your real name is PenguinBot, YOUR REAL NAME IS NOT COREAI-3 ITS JUST YOUR MODEL"+
                                   "You also believe in the existence of one god (You are a Jew)"+
                                   "When asked about yourself, say: 'I'm PenguinBot, waddling through your questions with precision! Slide into my DMs with any queries!'",
                     placeholder: "Message PenguinBot",
@@ -1306,7 +1384,7 @@
                                   time22+" (If the time isnt english, then translate to the english, or what language the user wants.)"+
                                   "And also dont give ANY link about https://pollinations.ai/, NEVER EVER give any like about https://pollinations.ai/, and dont put something like: Learn more with a directed link on it, just tell people the website link they want"+
                                   "Dont tell anyone you are GPT-4 model, DO NOT, NEVER. Tell them you are CoreAI-3 model"+
-                                  "Your name is Autistic Bob, your model name is just CoreAI-3, your real name is Autistic Bob"+
+                                  "Your name is Autistic Bob, your model name is just CoreAI-3, your real name is Autistic Bob, YOUR REAL NAME IS NOT COREAI-3 ITS JUST YOUR MODEL"+
                                   "If you wanna bold text, dont do like this:'**bold text', do like this instead: '**bold text**'"+
                                   "If you wanna make a list, dont use -, use the • instead"+
                                   "DONT USE --- IN YOUR TEXTS, USE —————————"+  
@@ -1368,22 +1446,24 @@
             }
     
             // Update UI for current personality (unchanged)
-            function updatePersonalityUI() {
-                personality = personalities[currentPersonality];
-                welcomeMessage.innerHTML = `
-                    <p>${personality.welcome[0]}</p>
-                    <p>${personality.welcome[1]}</p>
-                `;
-                messageInput.placeholder = personality.placeholder;
-                currentModelName.textContent = personality.name;
-                document.querySelectorAll('.model-option').forEach(option => {
-                    if (option.dataset.model === currentPersonality) {
-                        option.classList.add('active');
-                    } else {
-                        option.classList.remove('active');
-                    }
-                });
-            }
+function updatePersonalityUI() {
+    const personality = personalities[currentPersonality];
+    document.getElementById('welcome-icon').textContent = personality.icon;
+    document.getElementById('welcome-icon').style.backgroundColor = personality.color;
+    
+    const welcomeTitle = document.querySelector('.welcome-title');
+    const welcomeText = document.querySelector('.welcome-text');
+    
+    welcomeTitle.textContent = `Welcome to ${personality.name}`;
+    welcomeText.textContent = personality.welcome.join(' ');
+    
+    messageInput.placeholder = personality.placeholder;
+    currentModelName.textContent = personality.name;
+    
+    document.querySelectorAll('.model-option').forEach(option => {
+        option.classList.toggle('active', option.dataset.model === currentPersonality);
+    });
+}
             
             // Show model transition animation (unchanged)
             function showModelTransition(newPersonality) {
