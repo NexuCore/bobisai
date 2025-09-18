@@ -1629,30 +1629,32 @@ function updatePersonalityUI() {
             }
     
             // Change personality (unchanged)
-            function changePersonality(personality) {
-                if (personality === currentPersonality) return;
-                showModelTransition(personality);
-                closeDropdown();
-                setTimeout(() => {
-                    currentPersonality = personality;
-                    conversationHistory = [
-                        {
-                            role: "system",
-                            content: personalities[personality].systemMessage
-                        }
-                    ];
-                    chatMessages.innerHTML = '';
-                    welcomeMessage.style.display = 'block';
-                    welcomeMessage.classList.remove('hidden');
-                    updatePersonalityUI();
-                    localStorage.setItem('bobisai_personality', personality);
-                    localStorage.removeItem('bobisai_conversation');
-                    messageInput.disabled = false;
-                    sendButton.disabled = false;
-                    isAIResponding = false;
-                }, 100);
-                toggleAIBehaviorSection();
+function changePersonality(personality) {
+    if (personality === currentPersonality) return;
+    showModelTransition(personality);
+    closeDropdown();
+    setTimeout(() => {
+        currentPersonality = personality;
+        conversationHistory = [
+            {
+                role: "system",
+                content: personalities[personality].systemMessage
             }
+        ];
+        chatMessages.innerHTML = '';
+        welcomeMessage.style.display = 'block';
+        welcomeMessage.classList.remove('hidden');
+        updatePersonalityUI();
+        localStorage.setItem('bobisai_personality', personality);
+        localStorage.removeItem('bobisai_conversation');
+        messageInput.disabled = false;
+        sendButton.disabled = false;
+        isAIResponding = false;
+        
+        // This is the key fix - call toggleAIBehaviorSection after changing personality
+        toggleAIBehaviorSection();
+    }, 100);
+}
     
             // Add message to chat UI (UPDATED to handle images)
             function addMessage(text, sender, isImage = false) {
@@ -2436,9 +2438,9 @@ function processFormattedText(text, container) {
     
             // Initialize (unchanged)
             messageInput.focus();
-            applyTheme(currentTheme);
-            loadConversation();
-            toggleAIBehaviorSection();
+applyTheme(currentTheme);
+loadConversation();
+toggleAIBehaviorSection(); // Add this line
         });
     </script>
         <div class="warning-container" id="warning-container">
