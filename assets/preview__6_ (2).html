@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PS1 Video Recorder</title>
+<style>
+  body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #111;
+    color: white;
+    font-family: sans-serif;
+  }
+  canvas {
+    image-rendering: pixelated;
+    background: black;
+    margin: 10px 0;
+  }
+  .controls {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  label {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+  }
+  input[type="range"] {
+    width: 150px;
+  }
+  button {
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<h1>PS1 Video Recorder</h1>
+<canvas id="canvas" width="160" height="120"></canvas>
+
+<div id="startOverlay" style="
+  position: fixed; inset: 0;
+  background: #111;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 16px; z-index: 999;
+">
+  <div style="font-size: 48px;">📼</div>
+  <h2 style="margin:0; font-size: 22px; text-align:center;">PS1 Video Recorder</h2>
+  <p style="margin:0; color:#aaa; font-size:14px; text-align:center; max-width:260px;">
+    Tap to allow camera &amp; microphone access
+  </p>
+  <button id="startBtn" style="
+    padding: 14px 32px; font-size: 16px; cursor: pointer;
+    background: #e00; color: white; border: none; border-radius: 6px;
+    font-weight: bold; letter-spacing: 1px;
+  ">⏺ START</button>
+  <p id="startError" style="color:#f88; font-size:13px; margin:0; display:none;"></p>
+</div>
+
+<div class="controls">
+  <label>
+    Resolution
+    <input type="range" id="resSlider" min="40" max="160" value="80">
+  </label>
+  <label>
+    Color Depth
+    <input type="range" id="colorSlider" min="8" max="32" value="16">
+  </label>
+  <label>
+    Pixel Scale
+    <input type="range" id="scaleSlider" min="2" max="10" value="6">
+  </label>
+  <label>
+    Mic Volume
+    <input type="range" id="micSlider" min="0" max="2" step="0.01" value="1">
+  </label>
+  <label>
+    Distortion
+    <input type="range" id="distortSlider" min="0" max="1" step="0.01" value="0.2">
+  </label>
+  <label>
+    Camera
+    <select id="cameraSelect" style="font-size:14px; padding:4px; background:#222; color:white; border:1px solid #444; border-radius:4px;">
+      <option value="">Loading cameras...</option>
+    </select>
+  </label>
+  <button id="recordBtn">Start Recording</button>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let WIDTH = 80;
+let HEIGHT = 60;
+let COLOR_DEPTH = 16;
+let PIXEL_SCALE = 6;
+let MIC_VOLUME = 1;
+let DISTORTION = 0.2;
+
+const resSlider = document.getElementById('resSlider');
+const colorSlider = document.getElementById('colorSlider');
+const scaleSlider = document.getElementById('scaleSlider');
+const micSlider = document.getElementById('micSlider');
+const distortSlider = document.getElementById('distortSlider');
+const recordBtn = document.getElementById('recordBtn');
+const cameraSelect = document.getElementById('cameraSelect');
+
+let selectedDeviceId = null;
+
+let mediaRecorder;
+let recordedChunks = [];
+let videoStream;
+let audioStream;
+let combinedStream;
+let audioContext;
+let gainNode;
+let distortionNode;
+let dest;
+
+canvas.width = WIDTH;
+canvas.height = HEIGHT;
+canvas.style.width = WIDTH * PIXEL_SCALE + 'px';
+canvas.style.height = HEIGHT * PIXEL_SCALE + 'px';
+
+async function setupCamera(deviceId) {
+  if (videoStream) {
+    videoStream.getTracks().forEach(t => t.stop());
+  }
+  const constraints = { video: deviceId ? { deviceId: { exact: deviceId } } : true };
+  videoStream = await navigator.mediaDevices.getUserMedia(constraints);
+  const video = document.createElement('video');
+  video.srcObject = videoStream;
+  video.play();
+  return video;
+}
+
+async function populateCameras() {
+  const devices = await navigator.mediaDevices.enumerateDevices();
+  const cameras = devices.filter(d => d.kind === 'videoinput');
+  cameraSelect.innerHTML = '';
+  cameras.forEach((cam, i) => {
+    const opt = document.createElement('option');
+    opt.value = cam.deviceId;
+    opt.textContent = cam.label || `Camera ${i + 1}`;
+    cameraSelect.appendChild(opt);
+  });
+  if (cameras.length > 0) selectedDeviceId = cameras[0].deviceId;
+}
+
+async function setupMicrophone() {
+  audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  audioContext = new AudioContext();
+  const source = audioContext.createMediaStreamSource(audioStream);
+
+  gainNode = audioContext.createGain();
+  gainNode.gain.value = MIC_VOLUME;
+
+  distortionNode = audioContext.createWaveShaper();
+  setDistortionCurve(DISTORTION);
+
+  source.connect(gainNode);
+  gainNode.connect(distortionNode);
+  dest = audioContext.createMediaStreamDestination();
+  distortionNode.connect(dest);
+
+  return dest.stream;
+}
+
+function setDistortionCurve(amount) {
+  const n_samples = 44100;
+  const curve = new Float32Array(n_samples);
+  const k = amount * 100;
+  for (let i = 0; i < n_samples; ++i) {
+    const x = (i * 2 / n_samples) - 1;
+    curve[i] = ((3 + k) * x * 20 * Math.PI / 180) / (Math.PI + k * Math.abs(x));
+  }
+  distortionNode.curve = curve;
+  distortionNode.oversample = '4x';
+}
+
+function ps1Effect(imageData) {
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = Math.floor(data[i] / COLOR_DEPTH) * COLOR_DEPTH;
+    data[i+1] = Math.floor(data[i+1] / COLOR_DEPTH) * COLOR_DEPTH;
+    data[i+2] = Math.floor(data[i+2] / COLOR_DEPTH) * COLOR_DEPTH;
+  }
+  return imageData;
+}
+
+function drawDateOverlay() {
+  const now = new Date();
+
+  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const year = now.getFullYear();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+
+  const dateStr = `${day}.${month}.${year}`;
+  const timeStr = `${hours}:${minutes}:${seconds}`;
+
+  // Scale font size relative to canvas width
+  const fontSize = Math.max(4, Math.floor(WIDTH * 0.075));
+  ctx.font = `${fontSize}px monospace`;
+  ctx.textBaseline = 'top';
+
+  const padding = Math.max(2, Math.floor(WIDTH * 0.03));
+  const lineGap = Math.floor(fontSize * 1.3);
+
+  // Shadow for legibility (drawn pixel-offset, no blur — PS1 style)
+  ctx.fillStyle = 'rgba(0,0,0,0.7)';
+  ctx.fillText(dateStr, padding + 1, padding + 1);
+  ctx.fillText(timeStr, padding + 1, padding + lineGap + 1);
+
+  // Main text in classic camcorder amber/white
+  ctx.fillStyle = '#ffffaa';
+  ctx.fillText(dateStr, padding, padding);
+  ctx.fillText(timeStr, padding, padding + lineGap);
+}
+
+let currentVideo;
+
+async function render() {
+  await populateCameras();
+  currentVideo = await setupCamera(selectedDeviceId);
+  audioStream = await setupMicrophone();
+
+  function draw() {
+    ctx.drawImage(currentVideo, 0, 0, WIDTH, HEIGHT);
+    let frame = ctx.getImageData(0, 0, WIDTH, HEIGHT);
+    frame = ps1Effect(frame);
+    ctx.putImageData(frame, 0, 0);
+    drawDateOverlay();
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+}
+
+// Slider events
+resSlider.addEventListener('input', () => {
+  WIDTH = parseInt(resSlider.value);
+  HEIGHT = Math.floor(WIDTH * 0.75);
+  canvas.width = WIDTH;
+  canvas.height = HEIGHT;
+  canvas.style.width = WIDTH * PIXEL_SCALE + 'px';
+  canvas.style.height = HEIGHT * PIXEL_SCALE + 'px';
+});
+colorSlider.addEventListener('input', () => COLOR_DEPTH = parseInt(colorSlider.value));
+scaleSlider.addEventListener('input', () => {
+  PIXEL_SCALE = parseInt(scaleSlider.value);
+  canvas.style.width = WIDTH * PIXEL_SCALE + 'px';
+  canvas.style.height = HEIGHT * PIXEL_SCALE + 'px';
+});
+micSlider.addEventListener('input', () => { if (gainNode) gainNode.gain.value = MIC_VOLUME = parseFloat(micSlider.value); });
+distortSlider.addEventListener('input', () => { if (distortionNode) setDistortionCurve(DISTORTION = parseFloat(distortSlider.value)); });
+
+cameraSelect.addEventListener('change', async () => {
+  selectedDeviceId = cameraSelect.value;
+  currentVideo = await setupCamera(selectedDeviceId);
+});
+
+// Recording
+recordBtn.addEventListener('click', async () => {
+  if (!mediaRecorder || mediaRecorder.state === "inactive") {
+    recordedChunks = [];
+
+    if (!audioStream) audioStream = await setupMicrophone();
+
+    // Start recording current canvas stream
+    combinedStream = new MediaStream([
+      ...canvas.captureStream(30).getVideoTracks(),
+      ...audioStream.getAudioTracks()
+    ]);
+
+    mediaRecorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm; codecs=vp9' });
+
+    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'ps1_video_dynamic_res.webm';
+      a.click();
+      URL.revokeObjectURL(url);
+    };
+
+    mediaRecorder.start();
+    recordBtn.textContent = "Stop Recording";
+  } else if (mediaRecorder.state === "recording") {
+    mediaRecorder.stop();
+    recordBtn.textContent = "Start Recording";
+  }
+});
+
+// Start gate — required for mobile permission prompts
+const startOverlay = document.getElementById('startOverlay');
+const startBtn = document.getElementById('startBtn');
+const startError = document.getElementById('startError');
+
+startBtn.addEventListener('click', async () => {
+  startBtn.textContent = 'Starting…';
+  startBtn.disabled = true;
+  try {
+    await render();
+    startOverlay.style.display = 'none';
+  } catch (err) {
+    startError.textContent = 'Could not access camera/mic: ' + err.message;
+    startError.style.display = 'block';
+    startBtn.textContent = '⏺ START';
+    startBtn.disabled = false;
+  }
+});
+</script>
+
+</body>
+</html>
