@@ -34,6 +34,20 @@
   input[type="range"] {
     width: 150px;
   }
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  input[type="number"] {
+    width: 52px;
+    background: #222;
+    color: white;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 2px 4px;
+    font-size: 13px;
+  }
   button {
     padding: 8px 16px;
     font-size: 14px;
@@ -111,11 +125,11 @@
   </div>
 
   <!-- Shared sliders -->
-  <label>Resolution<input type="range" id="resSlider" min="40" max="160" value="80"></label>
-  <label>Color Depth<input type="range" id="colorSlider" min="8" max="32" value="16"></label>
-  <label>Pixel Scale<input type="range" id="scaleSlider" min="2" max="10" value="6"></label>
-  <label>Mic Volume<input type="range" id="micSlider" min="0" max="2" step="0.01" value="1"></label>
-  <label>Distortion<input type="range" id="distortSlider" min="0" max="1" step="0.01" value="0.2"></label>
+  <label>Resolution<div class="slider-row"><input type="range" id="resSlider" min="40" max="160" value="80"><input type="number" id="resNum" min="40" max="160" value="80"></div></label>
+  <label>Color Depth<div class="slider-row"><input type="range" id="colorSlider" min="8" max="32" value="16"><input type="number" id="colorNum" min="8" max="32" value="16"></div></label>
+  <label>Pixel Scale<div class="slider-row"><input type="range" id="scaleSlider" min="2" max="10" value="6"><input type="number" id="scaleNum" min="2" max="10" value="6"></div></label>
+  <label>Mic Volume<div class="slider-row"><input type="range" id="micSlider" min="0" max="2" step="0.01" value="1"><input type="number" id="micNum" min="0" max="2" step="0.01" value="1"></div></label>
+  <label>Distortion<div class="slider-row"><input type="range" id="distortSlider" min="0" max="1" step="0.01" value="0.2"><input type="number" id="distortNum" min="0" max="1" step="0.01" value="0.2"></div></label>
 
   <!-- Camera-only -->
   <label id="cameraSelectWrap">
@@ -137,11 +151,12 @@
     </label>
     <label style="font-size:14px;">
       Screen Vol
-      <input type="range" id="screenVolSlider" min="0" max="2" step="0.01" value="1" style="width:150px;">
+      <div class="slider-row"><input type="range" id="screenVolSlider" min="0" max="2" step="0.01" value="1" style="width:150px;"><input type="number" id="screenVolNum" min="0" max="2" step="0.01" value="1"></div>
     </label>
   </div>
 
   <button id="recordBtn">Start Recording</button>
+  <button id="photoBtn">📸 Take Photo</button>
 </div>
 
 <script>
@@ -174,6 +189,7 @@ let videoStream = null;
 let screenStream = null;
 let micRawStream = null;
 let audioContext, gainNode, screenGainNode, distortionNode, dest;
+let micSourceNode = null, screenSourceNode = null;
 let currentVideo = null;
 
 canvas.width = WIDTH; canvas.height = HEIGHT;
@@ -234,7 +250,7 @@ shareScreenBtn.addEventListener('click', async () => {
       audio: true  // will include screen audio if browser/OS supports it
     });
     const v = document.createElement('video');
-    v.srcObject = screenStream; v.play();
+    v.srcObject = screenStream; v.muted = true; v.play();
     currentVideo = v;
     buildAudioGraph();
     screenStream.getVideoTracks()[0].addEventListener('ended', () => {
@@ -248,16 +264,33 @@ shareScreenBtn.addEventListener('click', async () => {
 
 // ── Microphone ──────────────────────────────────────────────
 async function setupMicrophone() {
-  micRawStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  micRawStream = await navigator.mediaDevices.getUserMedia({
+    audio: {
+      echoCancellation: true,
+      noiseSuppression: true,
+      autoGainControl: false
+    }
+  });
 }
 
 // ── Audio graph ─────────────────────────────────────────────
 function buildAudioGraph() {
-  if (!audioContext) audioContext = new AudioContext();
+  if (!audioContext) {
+    audioContext = new AudioContext();
+    // Prevent the AudioContext from routing any audio to speakers.
+    // Without this, some browsers leak captured audio back to system output,
+    // which gets re-captured by getDisplayMedia → echo feedback loop.
+    if (typeof audioContext.setSinkId === 'function') {
+      audioContext.setSinkId({ type: 'none' }).catch(() => {});
+    }
+  }
 
+  try { if (micSourceNode) micSourceNode.disconnect(); } catch(e) {}
+  try { if (screenSourceNode) screenSourceNode.disconnect(); } catch(e) {}
   try { if (distortionNode) distortionNode.disconnect(); } catch(e) {}
   try { if (gainNode) gainNode.disconnect(); } catch(e) {}
   try { if (screenGainNode) screenGainNode.disconnect(); } catch(e) {}
+  micSourceNode = null; screenSourceNode = null;
 
   distortionNode = audioContext.createWaveShaper();
   setDistortionCurve(DISTORTION);
@@ -268,7 +301,8 @@ function buildAudioGraph() {
   if (chkMic.checked && micRawStream) {
     gainNode = audioContext.createGain();
     gainNode.gain.value = MIC_VOLUME;
-    audioContext.createMediaStreamSource(micRawStream).connect(gainNode);
+    micSourceNode = audioContext.createMediaStreamSource(micRawStream);
+    micSourceNode.connect(gainNode);
     gainNode.connect(distortionNode);
   }
 
@@ -278,7 +312,8 @@ function buildAudioGraph() {
     if (tracks.length) {
       screenGainNode = audioContext.createGain();
       screenGainNode.gain.value = SCREEN_VOL;
-      audioContext.createMediaStreamSource(new MediaStream(tracks)).connect(screenGainNode);
+      screenSourceNode = audioContext.createMediaStreamSource(new MediaStream(tracks));
+      screenSourceNode.connect(screenGainNode);
       screenGainNode.connect(distortionNode);
     }
   }
@@ -339,33 +374,59 @@ function startDrawLoop() {
   draw();
 }
 
-// ── Sliders ───────────────────────────────────────────────────
-resSlider.addEventListener('input', () => {
-  WIDTH = parseInt(resSlider.value); HEIGHT = Math.floor(WIDTH * 0.75);
+// ── Sliders + number inputs ───────────────────────────────────
+function syncPair(slider, numInput, onChange) {
+  slider.addEventListener('input', () => { numInput.value = slider.value; onChange(slider.value); });
+  numInput.addEventListener('input', () => {
+    let v = parseFloat(numInput.value);
+    if (isNaN(v)) return;
+    v = Math.min(parseFloat(slider.max), Math.max(parseFloat(slider.min), v));
+    slider.value = v; numInput.value = v; onChange(v);
+  });
+}
+
+const resNum      = document.getElementById('resNum');
+const colorNum    = document.getElementById('colorNum');
+const scaleNum    = document.getElementById('scaleNum');
+const micNum      = document.getElementById('micNum');
+const distortNum  = document.getElementById('distortNum');
+const screenVolNum= document.getElementById('screenVolNum');
+
+syncPair(resSlider, resNum, v => {
+  WIDTH = parseInt(v); HEIGHT = Math.floor(WIDTH * 0.75);
   canvas.width = WIDTH; canvas.height = HEIGHT;
   canvas.style.width = WIDTH * PIXEL_SCALE + 'px';
   canvas.style.height = HEIGHT * PIXEL_SCALE + 'px';
 });
-colorSlider.addEventListener('input', () => COLOR_DEPTH = parseInt(colorSlider.value));
-scaleSlider.addEventListener('input', () => {
-  PIXEL_SCALE = parseInt(scaleSlider.value);
+syncPair(colorSlider, colorNum, v => COLOR_DEPTH = parseInt(v));
+syncPair(scaleSlider, scaleNum, v => {
+  PIXEL_SCALE = parseInt(v);
   canvas.style.width = WIDTH * PIXEL_SCALE + 'px';
   canvas.style.height = HEIGHT * PIXEL_SCALE + 'px';
 });
-micSlider.addEventListener('input', () => {
-  MIC_VOLUME = parseFloat(micSlider.value);
+syncPair(micSlider, micNum, v => {
+  MIC_VOLUME = parseFloat(v);
   if (gainNode) gainNode.gain.value = MIC_VOLUME;
 });
-distortSlider.addEventListener('input', () => {
-  DISTORTION = parseFloat(distortSlider.value);
+syncPair(distortSlider, distortNum, v => {
+  DISTORTION = parseFloat(v);
   setDistortionCurve(DISTORTION);
 });
-screenVolSlider.addEventListener('input', () => {
-  SCREEN_VOL = parseFloat(screenVolSlider.value);
+syncPair(screenVolSlider, screenVolNum, v => {
+  SCREEN_VOL = parseFloat(v);
   if (screenGainNode) screenGainNode.gain.value = SCREEN_VOL;
 });
+
 chkMic.addEventListener('change', buildAudioGraph);
 chkScreenAudio.addEventListener('change', buildAudioGraph);
+
+// ── Take Photo ────────────────────────────────────────────────
+document.getElementById('photoBtn').addEventListener('click', () => {
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = 'ps1_photo.png';
+  a.click();
+});
 
 // ── Recording ─────────────────────────────────────────────────
 recordBtn.addEventListener('click', () => {
